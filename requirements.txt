@@ -1,0 +1,9 @@
+customtkinter==5.2.1
+requests==2.31.0
+certifi==2023.7.22
+charset_normalizer==3.3.2
+darkdetect==0.8.0
+idna==3.4
+packaging==23.2
+pip==23.2.1
+urllib3==2.1.0
