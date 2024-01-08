@@ -35,3 +35,4 @@ with open(r"C:\Users\mejxe\PycharmProjects\habbitTracker\commits.json", "w") as 
     json.dump(data, data_file, indent=2)
 
 
+

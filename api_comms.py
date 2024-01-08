@@ -204,3 +204,4 @@ class Pixela:
         with open('commits.json', 'w') as data_file:
             json.dump(data, data_file, indent=2)
         self.quantity = 0
+
