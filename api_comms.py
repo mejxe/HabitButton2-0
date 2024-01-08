@@ -1,11 +1,12 @@
 import datetime
 import requests
 import json
+import os
 
 class Pixela:
     def __init__(self,graph_endpoint, graph_name):
         self.username = "mejxe"
-        self.token = "dsadjigojrtio63"
+        self.token = os.environ.get("token")
         self.graph_data = {
             "id": "studygraph",
             "name": "Study Tracker",

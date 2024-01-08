@@ -14,7 +14,7 @@ with open(r"C:\Users\mejxe\PycharmProjects\habbitTracker\commits.json", "r") as 
     data.update(data_to_update)
 
 # date_now = datetime.datetime.strftime(datetime.date.today(), "%Y%m%d")
-# token = "dsadjigojrtio63"
+# token = os.environ.get("token")
 #
 # params = {
 #     "quantity": str(quantity),

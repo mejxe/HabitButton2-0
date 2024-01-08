@@ -1,4 +1,5 @@
 import requests
+import os
 """
 Graph managing shortcut,
 run only if you want to make, update or delete an endpoint
@@ -13,7 +14,7 @@ graph_data = {
             "type": "int",
             "color": "ajisai"
 }
-token = "dsadjigojrtio63"
+token = os.environ.get("token")
 headers = {
             "X-USER-TOKEN": token
         }
