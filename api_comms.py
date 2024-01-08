@@ -205,3 +205,4 @@ class Pixela:
             json.dump(data, data_file, indent=2)
         self.quantity = 0
 
+
