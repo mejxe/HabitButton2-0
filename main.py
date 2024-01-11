@@ -1,12 +1,16 @@
 from api_comms import Pixela
-from guiproject import Gui
-# graph_endpoints = {"study": "https://pixe.la/v1/users/mejxe/graphs/studygraph",
-#                    "math": "https://pixe.la/v1/users/mejxe/graphs/mathgraph",
-#                    "code": "https://pixe.la/v1/users/mejxe/graphs/codegraph"}
+from gui import Gui
+from selection import Select
 
-pixela = Pixela()
-pixela.get_pixel_attributes()
-quantities = pixela.quantities
+graph_endpoints = {"study": "https://pixe.la/v1/users/mejxe/graphs/studygraph",
+                   "math": "https://pixe.la/v1/users/mejxe/graphs/mathgraph",
+                   "code": "https://pixe.la/v1/users/mejxe/graphs/codegraph"}
 
 
-ui = Gui(quantities=quantities, pixela=pixela)
+select = Select()
+
+pixela = Pixela(graph_endpoints[select.selection], graph_name=select.selection)
+quantity = pixela.get_pixel_attributes()
+
+
+ui = Gui(quantity=int(quantity), pixela=pixela)
