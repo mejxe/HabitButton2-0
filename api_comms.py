@@ -4,7 +4,7 @@ import json
 import os
 
 class Pixela:
-    def __init__(self,graph_endpoint, graph_name):
+    def __init__(self):
         self.username = "mejxe"
         self.token = os.environ.get("token")
         self.graph_data = {
@@ -14,51 +14,68 @@ class Pixela:
             "type": "int",
             "color": "shibafu"
         }
-        self.graph_endpoint = graph_endpoint
+        self.graph_endpoints = ["https://pixe.la/v1/users/mejxe/graphs/studygraph",
+                                "https://pixe.la/v1/users/mejxe/graphs/mathgraph",
+                                "https://pixe.la/v1/users/mejxe/graphs/codegraph"]
         self.graph_title = ["Code Tracker","Study Tracker", "Math Tracker"]
-        self.graph_name = graph_name
         self.headers = {
             "X-USER-TOKEN": self.token
         }
+        self.quantities = []
         self.date_now = datetime.datetime.strftime(datetime.date.today(), "%Y%m%d")
         # PIXEL ATTRIBUTES
 
 
     def get_pixel_attributes(self):
-        req = requests.get(f"{self.graph_endpoint}/{self.date_now}",
-                           headers=self.headers)
-        response = req.json()
-        print(response)
-        try:
-            self.quantity = response["quantity"]
-        except KeyError:
-            if response["message"] == "Specified pixel not found.":
-                self.quantity = "0"
-            elif response["isRejected"]:
-                while True:
-                            s = requests.get(f"{self.graph_endpoint}/{self.date_now}", headers=self.headers)
-                            if "message" in s.json():
-                                if s.json()["message"] == "Specified pixel not found.":
-                                    self.quantity = 0
-                                    print('not found')
-                                    break
-                            if 'isRejected' in s.json():
-                                print('rejected')
-                                pass
-                            else:
-                                if "quantity" in s.json():
-                                    self.quantity = s.json()["quantity"]
-                                    print("success")
-                                    break
-                                else: raise Exception(TimeoutError)
+        for i in range(len(self.graph_endpoints)):
+            req = requests.get(f"{self.graph_endpoints[i]}/{self.date_now}",
+                               headers=self.headers)
+            response = req.json()
+            print(response)
 
-        with open('commits.json', "r") as data_file:
-            data = json.load(data_file)
-            data_to_update = {self.graph_name:self.quantity}
-            data.update(data_to_update)
-        with open('commits.json', "w") as data_file:
-            json.dump(data, data_file, indent=2)
-        return self.quantity
+            try:
+                my_dict = {self.graph_endpoints[i]:response["quantity"]}
+                self.quantities.append(my_dict)
+            except KeyError:
+
+                if response["message"] == "Specified pixel not found.":
+                    my_dict = {self.graph_endpoints[i]:"0"}
+                    self.quantities.append(my_dict)
+
+                elif response["isRejected"]:
+
+                    while True:
+                                s = requests.get(f"{self.graph_endpoints[i]}/{self.date_now}", headers=self.headers)
+
+                                if "message" in s.json():
+                                    if s.json()["message"] == "Specified pixel not found.":
+                                        my_dict = {self.graph_endpoints[i]: "0"}
+                                        self.quantities.append(my_dict)
+                                        print('not found')
+                                        break
+
+                                if 'isRejected' in s.json():
+                                    print('rejected')
+                                    pass
+
+                                else:
+                                    if "quantity" in s.json():
+                                        my_dict = {self.graph_endpoints[i]:s.json()["quantity"]}
+                                        self.quantities.append(my_dict)
+                                        print("success")
+                                        break
+
+                                    else: raise Exception(TimeoutError)
+
+            with open('commits.json', "r") as data_file:
+                data = json.load(data_file)
+                data_to_update = self.quantities[i]
+                data.update(data_to_update)
+
+            with open('commits.json', "w") as data_file:
+                json.dump(data, data_file, indent=2)
+
+        print(self.quantities)
 
 
 
@@ -69,50 +86,14 @@ class Pixela:
         graph = requests.post(f'https://pixe.la/v1/users/{self.username}/graphs', headers=self.headers, json=self.graph_data)
         print(graph.text)
 
-    # def create_pixel(self):
-    #     # CREATE
-    #     if self.quantity == "0":
-    #         data = {
-    #             "date": self.date_now,
-    #             "quantity": "1"
-    #         }
-    #         req = requests.post(f"{self.graph_endpoint}", json=data, headers=self.headers)
-    #         if not req.json()["isSuccess"]:
-    #             print("failed")
-    #         else:
-    #             print("success")
-    #             self.quantity = 1
-    #
-    #     # UPDATE
-    #     else:
-    #         data = {
-    #             "quantity": str(int(self.quantity) + 1)
-    #         }
-    #         req = requests.put(f"{self.graph_endpoint}/{self.date_now}", json=data,
-    #                            headers=self.headers)
-    #         if not req.json()["isSuccess"]:
-    #             while True:
-    #                 try:
-    #                     g = requests.put(f"{self.graph_endpoint}/{self.date_now}",
-    #                                       json=data, headers=self.headers)
-    #                     _ = g.json()["isRejected"]
-    #                 except KeyError:
-    #                     break
-    #         self.quantity = int(self.quantity) + 1
-    #         print("success")
-    #
-    #
-    #
-    #     return self.quantity, self.quantity
-
     def create_pixel(self):
-        print(self.quantity)
-        data = {
-            "date": self.date_now,
-            "quantity": str(self.quantity)
-            }
-        while True:
-                req = requests.post(f"{self.graph_endpoint}", json=data, headers=self.headers)
+        for i in range(len(self.graph_endpoints)):
+            data = {
+                "date": self.date_now,
+                "quantity": str(self.quantities[i][self.graph_endpoints[i]])
+                }
+            while True:
+                req = requests.post(f"{self.graph_endpoints[i]}", json=data, headers=self.headers)
                 response = req.json()
                 print(response)
                 if "isRejected" in response:
@@ -120,7 +101,7 @@ class Pixela:
                 else:
                     break
 
-        self.calculate_study()
+            self.calculate_study()
 
 
     def calculate_study(self):
@@ -152,17 +133,18 @@ class Pixela:
         data = {
             "quantity":str(self.quantity)
         }
-        while True:
-            try:
-                req = requests.put(f"{self.graph_endpoint}/{self.date_now}", json=data, headers=self.headers)
-                response = req.json()
-                print(response)
-                if response["isRejected"]:
+        for graph_endpoint in self.graph_endpoints:
+            while True:
+                try:
+                    req = requests.put(f"{graph_endpoint}/{self.date_now}", json=data, headers=self.headers)
+                    response = req.json()
                     print(response)
-                else:
+                    if response["isRejected"]:
+                        print(response)
+                    else:
+                        break
+                except KeyError:
                     break
-            except KeyError:
-                break
 
 
 
@@ -183,18 +165,18 @@ class Pixela:
         self.quantity = 0
 
 
-    def quantity_up(self):
+    def quantity_up(self, graph_endpoint):
         with open("commits.json", "r") as data_file:
             data = json.load(data_file)
-            quantity = int(data[self.graph_name])
+            quantity = int(data[self.graph_endpoints[graph_endpoint]])
             quantity += 1
             self.quantity = quantity
-            data_to_update = {self.graph_name: quantity}
+            data_to_update = {self.graph_endpoints[graph_endpoint]: quantity}
             data.update(data_to_update)
 
         with open('commits.json', "w") as data_file:
             json.dump(data, data_file, indent=2)
-        return quantity, quantity
+        return quantity
 
     def json_clear(self):
         with open('commits.json', 'r') as data_file:
