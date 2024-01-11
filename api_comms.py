@@ -61,52 +61,20 @@ class Pixela:
         return self.quantity
 
 
-
-
-
-
     def graph_create(self):
         graph = requests.post(f'https://pixe.la/v1/users/{self.username}/graphs', headers=self.headers, json=self.graph_data)
         print(graph.text)
 
-    # def create_pixel(self):
-    #     # CREATE
-    #     if self.quantity == "0":
-    #         data = {
-    #             "date": self.date_now,
-    #             "quantity": "1"
-    #         }
-    #         req = requests.post(f"{self.graph_endpoint}", json=data, headers=self.headers)
-    #         if not req.json()["isSuccess"]:
-    #             print("failed")
-    #         else:
-    #             print("success")
-    #             self.quantity = 1
-    #
-    #     # UPDATE
-    #     else:
-    #         data = {
-    #             "quantity": str(int(self.quantity) + 1)
-    #         }
-    #         req = requests.put(f"{self.graph_endpoint}/{self.date_now}", json=data,
-    #                            headers=self.headers)
-    #         if not req.json()["isSuccess"]:
-    #             while True:
-    #                 try:
-    #                     g = requests.put(f"{self.graph_endpoint}/{self.date_now}",
-    #                                       json=data, headers=self.headers)
-    #                     _ = g.json()["isRejected"]
-    #                 except KeyError:
-    #                     break
-    #         self.quantity = int(self.quantity) + 1
-    #         print("success")
-    #
-    #
-    #
-    #     return self.quantity, self.quantity
 
-    def create_pixel(self):
+    def create_pixel(self, yesterday):
         print(self.quantity)
+        print(yesterday)
+        if yesterday == "on":
+            print('yesterday')
+            self.date_now = datetime.datetime.strftime(datetime.date.today().replace(day=datetime.datetime.today().day - 1), "%Y%m%d")
+        if yesterday == "off":
+            print("today")
+            self.date_now = datetime.datetime.strftime(datetime.date.today(), "%Y%m%d")
         data = {
             "date": self.date_now,
             "quantity": str(self.quantity)

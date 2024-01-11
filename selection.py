@@ -1,47 +1,36 @@
 from customtkinter import *
 import webbrowser
 
-GRAY = "#565656"
+GRAY = "#303030"
+FONT = ("Work Sans", 15, "normal")
+
 class Select:
     def __init__(self):
         self.root = CTk()
-        self.root.config(background="#565656", width=200, height=200, pady=20, padx=20)
+        self.root.config(background=GRAY, width=200, height=200, pady=20, padx=20)
         self.root.resizable(False, False)
+        self.root.title = "Select"
+        set_appearance_mode("dark")
+        set_default_color_theme("blue")
 
 
-    # Buttons
-
-    #
-    #     self.code = CTkRadioButton(self.root, text="Code", value="code", variable=self.selection, bg_color='#565656',
-    #                                text_color='black', hover_color='purple', border_color='black', fg_color='purple')
-    #     self.code.grid(column=0, row=0, padx=10, pady=10)
-    #     self.study = CTkRadioButton(self.root, text="Study", value="study", variable=self.selection, bg_color='#565656',
-    #                                text_color='black', hover_color='green', border_color='black', fg_color='green')
-    #     self.study.grid(column=0, row=1, padx=10, pady=10)
-    #     self.math = CTkRadioButton(self.root, text="Math", value="math", variable=self.selection, bg_color='#565656',
-    #                                text_color='black', hover_color='blue', border_color='black', fg_color='blue')
-    #     self.math.grid(column=0, row=2, padx=10, pady=10)
-    #
-    #     self.submit = CTkButton(self.root, text="Submit", bg_color="#565656", command=self.get_var)
-    #     self.submit.grid(column=0,row=3)
-    #
-    #
-    #     self.root.grid_propagate(False)
+        self.study = CTkButton(self.root, width=50, height=25, text="Study", font=FONT, bg_color=GRAY,
+                               fg_color="#26842c", hover_color="dark green", corner_radius=10)
+        self.study.grid(column=1, row=1, padx=0, pady=5)
 
 
-        self.study = CTkButton(self.root, text="Study", font=("Bahnshcrift", 15, "bold"), bg_color=GRAY,
-                               fg_color="#26842c")
-        self.study.grid(column=0, row=1, padx=10, pady=10)
+        self.code = CTkButton(self.root, width=50, height=25, text="Code", font=FONT, bg_color=GRAY,
+                               fg_color="#3c007a", command=lambda *args: self.return_endpoint('code'), hover_color = '#2A0944', corner_radius=10)
+        self.code.grid(column=2, row=1, padx=0, pady=5)
 
 
-        self.code = CTkButton(self.root, text="Code", font=("Bahnshcrift", 15, "bold"), bg_color=GRAY,
-                               fg_color="#3c007a", command=lambda *args: self.return_endpoint('code'))
-        self.code.grid(column=0, row=2, padx=10, pady=10)
+        self.math = CTkButton(self.root, width=50, height=25, text="Math", font=FONT, bg_color=GRAY,
+                               fg_color="#0055ab", command=lambda *args: self.return_endpoint('math'), hover_color="dark blue", corner_radius=10)
+        self.math.grid(column=3, row=1, padx=0, pady=10)
 
-
-        self.math = CTkButton(self.root, text="Math", font=("Bahnshcrift", 15, "bold"), bg_color=GRAY,
-                               fg_color="#0055ab", command=lambda *args: self.return_endpoint('math'))
-        self.math.grid(column=0, row=3, padx=10, pady=10)
+        self.pomodoro = CTkButton(self.root, width=20, height=20, text="Pomodoro", font=FONT, bg_color=GRAY,
+                               fg_color="#7D1935", hover_color="red", corner_radius=10)
+        self.pomodoro.grid(column=2, row=2, columnspan=1)
 
         self.study.bind("<Button-1>", lambda *args: self.return_endpoint('study'))
         self.study.bind("<Button-3>", lambda *args: self.go_to('study'))
