@@ -2,7 +2,7 @@ from customtkinter import *
 from api_comms import Pixela
 import webbrowser
 
-FONT = ("Segoe Ui", 15, "bold")
+FONT = ("Work Sans", 15, "bold")
 class Gui:
     def __init__(self, quantity, pixela: Pixela):
         self.root = CTk()

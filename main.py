@@ -1,11 +1,10 @@
 from api_comms import Pixela
-from gui import Gui
+from guiproject import Gui
 from selection import Select
 
 graph_endpoints = {"study": "https://pixe.la/v1/users/mejxe/graphs/studygraph",
                    "math": "https://pixe.la/v1/users/mejxe/graphs/mathgraph",
                    "code": "https://pixe.la/v1/users/mejxe/graphs/codegraph"}
-
 
 select = Select()
 
