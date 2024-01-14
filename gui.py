@@ -7,19 +7,19 @@ GRAY = "#303030"
 class Gui:
     def __init__(self, quantity, pixela: Pixela):
         self.root = CTk()
-        self.root.title = "Habit Button"
-        self.root.config(background=GRAY, width=250, height=400,pady=20, padx=20)
+        self.root.config(background=GRAY,pady=20, padx=20)
+        self.root.geometry("250x400+960+540")
         self.root.resizable(False,False)
         if pixela.graph_endpoint == "https://pixe.la/v1/users/mejxe/graphs/studygraph":
-            self.root.title = pixela.graph_title[1]
+            self.root.title(pixela.graph_title[1])
             self.colors = ['#effaef','#c2edc5','#96e09b','#70d577','#44c94d',
                            '#31aa39','#26842c','#1b5e1f','#103813',]
         elif pixela.graph_endpoint == "https://pixe.la/v1/users/mejxe/graphs/mathgraph":
-            self.root.title = pixela.graph_title[2]
+            self.root.title(pixela.graph_title[2])
             self.colors = ['#daecfe','#a9d3ff','#78bbff','#47a2ff','#168aff',
                            '#006ad5','#0055ab','#003c7a','#002449','#000c18']
         else:
-            self.root.title = pixela.graph_title[0]
+            self.root.title(pixela.graph_title[0])
             self.colors = ['#f4eaff','#d8b1fe','#bf80ff','#a247ff','#860eff',
                            "#6d00dc",'#5500ab','#3c007a','#240049','#080010']
         self.pixela = pixela
@@ -35,7 +35,7 @@ class Gui:
             self.button.configure(text_color="white")
         self.button.grid(column=0, row=1)
 
-        self.clear_button = CTkButton(self.root, height=100, width=100, text="✘",hover_color="#950101",corner_radius=30, bg_color=GRAY, fg_color="#7D1935", text_color="black", font=FONT, command=self.reset)
+        self.clear_button = CTkButton(self.root, height=100, width=100, text="X",hover_color="#950101",corner_radius=30, bg_color=GRAY, fg_color="#7D1935", text_color="black", font=FONT, command=self.reset)
         self.clear_button.grid(column=0, row=2, pady=15, padx=20)
 
         self.yesterday_var = StringVar(value="off")

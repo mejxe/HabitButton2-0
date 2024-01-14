@@ -7,9 +7,10 @@ FONT = ("Work Sans", 15, "normal")
 class Select:
     def __init__(self):
         self.root = CTk()
-        self.root.config(background=GRAY, width=200, height=200, pady=20, padx=20)
+        self.root.config(background=GRAY, pady=20, padx=20)
+        self.root.geometry("260x130+960+540")
         self.root.resizable(False, False)
-        self.root.title = "Select"
+        self.root.title("Select")
         set_appearance_mode("dark")
         set_default_color_theme("blue")
 
