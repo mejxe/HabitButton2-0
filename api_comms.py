@@ -162,7 +162,7 @@ class Pixela:
 
         with open('commits.json', "w") as data_file:
             json.dump(data, data_file, indent=2)
-        return quantity, quantity
+        return quantity
 
     def json_clear(self):
         with open('commits.json', 'r') as data_file:
