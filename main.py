@@ -9,7 +9,7 @@ graph_endpoints = {"study": "https://pixe.la/v1/users/mejxe/graphs/studygraph",
 while True:
     select = Select()
     try:
-        pixela = Pixela(graph_endpoints[select.selection], graph_name=select.selection)
+        pixela = Pixela(graph_endpoints[select.selection], graph_name=select.selection, auto_commits=select.auto_commits)
         quantity = pixela.get_pixel_attributes()
         ui = Gui(quantity=int(quantity), pixela=pixela)
     except AttributeError:

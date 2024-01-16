@@ -11,13 +11,17 @@ BFONT = ("Work Sans", 15, "normal")
 CFONT = ("Work Sans", 17, "normal")
 GRAY = "#303030"
 class Timer(CTkToplevel):
-    def __init__(self, graphs):
+    def __init__(self, graphs, root):
         super().__init__()
         self.title("Timer")
         self.geometry("450x350")
         self.configure(fg_color=GRAY)
         self.graphs = graphs
         self.iters = -1
+        self.root = root
+        self.commits = 0
+        self.ret = None
+        self.wm_protocol("WM_DELETE_WINDOW", self.on_close)
 
         # Frame
 
@@ -90,8 +94,9 @@ class Timer(CTkToplevel):
 
         # over
         if not self.strftime >= 0:
+
+            self.cache()
             self.over()
-            #TODO: count the reps and return to main gui
 
     # enable/disable start button
     def enable(self):
@@ -129,7 +134,6 @@ class Timer(CTkToplevel):
 
     def over(self):
         self.after_cancel(self.after_id)
-        self.r.set(0)
         self.clock.configure(text="00:00:00", text_color="white")
         self.start.configure(fg_color="#A619D5")
         self.pause_button.configure(fg_color="#6D0D91")
@@ -137,10 +141,20 @@ class Timer(CTkToplevel):
         self.enable()
         self.pause_button.configure(state="disabled")
         self.reset.configure(state="disabled")
-        self.check.configure(state="normal")
-        self.check2.configure(state="normal")
-        self.r.set(0)
         self.i = False
         self.pause_button.configure(text="Pause.")
 
+    def cache(self):
+        self.commits += 1
+        if self.r.get() == 1:
+            print("math")
+            self.ret = "math"
 
+        if self.r.get() == 2:
+            print("code")
+
+            self.ret = "code"
+
+
+    def on_close(self):
+        self.root.destroy()

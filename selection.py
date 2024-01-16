@@ -12,6 +12,7 @@ class Select:
         self.root.geometry("260x130+960+540")
         self.root.resizable(False, False)
         self.root.title("Select")
+        self.auto_commits = 0
         set_appearance_mode("dark")
         set_default_color_theme("blue")
 
@@ -30,9 +31,9 @@ class Select:
                                fg_color="#0055ab", command=lambda *args: self.return_endpoint('math'), hover_color="dark blue", corner_radius=10)
         self.math.grid(column=3, row=1, padx=5, pady=10)
 
-        self.pomodoro = CTkButton(self.root, command=self.open_timer, width=20, height=20, text="Auto", font=FONT, bg_color=GRAY,
+        self.auto = CTkButton(self.root, command=self.open_timer, width=20, height=20, text="1 Hour", font=FONT, bg_color=GRAY,
                                fg_color="#7D1935", hover_color="#480e1f", corner_radius=10)
-        self.pomodoro.grid(column=2, row=2, columnspan=1)
+        self.auto.grid(column=2, row=2, columnspan=1)
 
         self.study.bind("<Button-1>", lambda *args: self.return_endpoint('study'))
         self.study.bind("<Button-3>", lambda *args: self.go_to('study'))
@@ -65,7 +66,12 @@ class Select:
 
     # POMODORO
     def open_timer(self):
+
         endpoints = [
-            "study","math","code"
+            "study", "math", "code"
         ]
-        timer = Timer(endpoints)
+        self.timer = Timer(endpoints, self.root)
+        if self.timer.commits > 0:
+            self.selection = self.timer.ret
+            self.auto_commits = self.timer.commits
+
