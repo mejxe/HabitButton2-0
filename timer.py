@@ -30,22 +30,22 @@ class Timer(CTkToplevel):
         # Timer Buttons
 
         # start/stop
-        self.start = CTkButton(self.frame, width=70, height=35, text="Start.", font=BFONT, corner_radius=10, fg_color="#A619D5", command=self.start_count, state="disabled", hover_color="#17005f")
+        self.start = CTkButton(self.frame, width=70, height=35, text="Start.", font=BFONT, corner_radius=10, fg_color="#A619D5", command=self.start_count, state="disabled", hover_color="#17005f", text_color="black")
         #self.start.grid(row=1, column=1,sticky="e", padx=10)
         self.start.place(x=100, y=150, anchor="center")
         # reset
-        self.reset = CTkButton(self.frame, width=70, height=35, text="Reset.", font=BFONT, corner_radius=10, fg_color="#40045A", state="disabled",hover_color="red", command=self.over)
+        self.reset = CTkButton(self.frame, width=70, height=35, text="Reset.", font=BFONT, corner_radius=10, fg_color="#40045A", state="disabled",hover_color="red", command=self.over, text_color="black")
         #self.reset.grid(row=1, column=2, sticky="w")
         self.reset.place(x=300, y=150, anchor="center")
 
-        self.pause_button = CTkButton(self.frame, width=70, height=35, text="Pause.", font=BFONT, corner_radius=10, fg_color="#6D0D91", state="disabled",hover_color="red", command=self.pause)
+        self.pause_button = CTkButton(self.frame, width=70, height=35, text="Pause.", font=BFONT, corner_radius=10, fg_color="#6D0D91", state="disabled",hover_color="red", command=self.pause, text_color="black")
         self.pause_button.place(x=200, y=150, anchor="center")
         # graph
         self.r = IntVar()
         self.r.set(0)
 
-        self.check = CTkRadioButton(self.frame, text="Math", font=CFONT, variable=self.r, value=1, fg_color="#0055ab", hover_color="#0055ab",command=self.enable)
-        self.check2 = CTkRadioButton(self.frame, text="Code", font=CFONT, variable=self.r, value=2, fg_color="#3c007a", hover_color="#3c007a",command=self.enable)
+        self.check = CTkRadioButton(self.frame, text="Math", font=CFONT, variable=self.r, value=1, fg_color="#0055ab", hover_color="#0055ab",command=self.enable, state='normal')
+        self.check2 = CTkRadioButton(self.frame, text="Code", font=CFONT, variable=self.r, value=2, fg_color="#3c007a", hover_color="#3c007a",command=self.enable, state='normal')
 
         self.check.place(x=150, y=220, anchor="center")
         self.check2.place(x=270, y=220, anchor="center")
@@ -55,8 +55,8 @@ class Timer(CTkToplevel):
     def start_count(self):
         self.strftime = 3600
         print(self.strftime)
-        self.pause_button.configure(state="enabled")
-        self.reset.configure(state="enabled")
+        self.pause_button.configure(state="normal")
+        self.reset.configure(state="normal")
         self.start.configure(state="disabled")
         self.check.configure(state="disabled")
         self.check2.configure(state="disabled")
@@ -69,6 +69,7 @@ class Timer(CTkToplevel):
         minutes = math.floor(self.strftime/60)
         seconds = self.strftime % 60
         minutes_not_formatted = minutes
+        print(minutes_not_formatted)
         # time formatting
         if hours == 0:
             hours = "00"
@@ -83,28 +84,27 @@ class Timer(CTkToplevel):
         self.after_id = self.after(1000, self.counter)
 
         # color change every 10 minutes
-        if minutes_not_formatted % 10 == 0:
+        if minutes_not_formatted % 10 == 0 and minutes_not_formatted != 0:
             self.color_change()
 
 
-
         # over
-        if self.strftime == 0:
+        if not self.strftime >= 0:
             self.over()
             #TODO: count the reps and return to main gui
 
     # enable/disable start button
     def enable(self):
         if self.r.get() != 0:
-            self.start.configure(state="enabled")
+            self.start.configure(state="normal")
         if self.r.get() == 2:
-            self.start.configure(fg_color="#F4EAFF")
-            self.pause_button.configure(fg_color="#9875BD")
-            self.reset.configure(fg_color="#3C007A")
+            self.start.configure(fg_color="#F4EAFF", text_color="black")
+            self.pause_button.configure(fg_color="#9875BD", text_color="white")
+            self.reset.configure(fg_color="#3C007A", text_color="white")
         if self.r.get() == 1:
-            self.start.configure(fg_color="#DAECFE")
-            self.pause_button.configure(fg_color="#6D94BC")
-            self.reset.configure(fg_color="#003C7A")
+            self.start.configure(fg_color="#DAECFE", text_color="black")
+            self.pause_button.configure(fg_color="#6D94BC", text_color="black")
+            self.reset.configure(fg_color="#003C7A", text_color="black")
 
 
 
@@ -114,7 +114,7 @@ class Timer(CTkToplevel):
             self.after_cancel(self.after_id)
             self.pause_button.configure(text="Resume.")
         else:
-            self.after(1000, self.counter)
+            self.after_id = self.after(1000, self.counter)
             self.pause_button.configure(text="Pause.")
 
     def color_change(self):
@@ -129,6 +129,7 @@ class Timer(CTkToplevel):
 
     def over(self):
         self.after_cancel(self.after_id)
+        self.r.set(0)
         self.clock.configure(text="00:00:00", text_color="white")
         self.start.configure(fg_color="#A619D5")
         self.pause_button.configure(fg_color="#6D0D91")
@@ -136,7 +137,10 @@ class Timer(CTkToplevel):
         self.enable()
         self.pause_button.configure(state="disabled")
         self.reset.configure(state="disabled")
-        self.check.configure(state="enabled")
-        self.check2.configure(state="enabled")
+        self.check.configure(state="normal")
+        self.check2.configure(state="normal")
+        self.r.set(0)
+        self.i = False
+        self.pause_button.configure(text="Pause.")
 
 
