@@ -1,5 +1,7 @@
 from customtkinter import *
 import math
+from CTkMessagebox import  CTkMessagebox
+import winsound
 
 colors_code = ['#f4eaff','#d8b1fe','#bf80ff','#a247ff','#860eff',
                            "#6d00dc",'#5500ab','#3c007a','#240049','#080010']
@@ -22,6 +24,7 @@ class Timer(CTkToplevel):
         self.commits = 0
         self.ret = None
         self.wm_protocol("WM_DELETE_WINDOW", self.on_close)
+        self.resizable(False,False)
 
         # Frame
 
@@ -38,11 +41,11 @@ class Timer(CTkToplevel):
         #self.start.grid(row=1, column=1,sticky="e", padx=10)
         self.start.place(x=100, y=150, anchor="center")
         # reset
-        self.reset = CTkButton(self.frame, width=70, height=35, text="Reset.", font=BFONT, corner_radius=10, fg_color="#40045A", state="disabled",hover_color="red", command=self.over, text_color="black")
+        self.reset = CTkButton(self.frame, width=70, height=35, text="Reset.", font=BFONT, corner_radius=10, fg_color="#40045A", state="disabled",hover_color="#8a09c2", command=self.over, text_color="black")
         #self.reset.grid(row=1, column=2, sticky="w")
         self.reset.place(x=300, y=150, anchor="center")
 
-        self.pause_button = CTkButton(self.frame, width=70, height=35, text="Pause.", font=BFONT, corner_radius=10, fg_color="#6D0D91", state="disabled",hover_color="red", command=self.pause, text_color="black")
+        self.pause_button = CTkButton(self.frame, width=70, height=35, text="Pause.", font=BFONT, corner_radius=10, fg_color="#6D0D91", state="disabled",hover_color="#b016ea", command=self.pause, text_color="black")
         self.pause_button.place(x=200, y=150, anchor="center")
         # graph
         self.r = IntVar()
@@ -94,22 +97,24 @@ class Timer(CTkToplevel):
 
         # over
         if not self.strftime >= 0:
-
-            self.cache()
             self.over()
+            self.popup()
+
+        if self.strftime == 60:
+            self.cache()
 
     # enable/disable start button
     def enable(self):
         if self.r.get() != 0:
             self.start.configure(state="normal")
         if self.r.get() == 2:
-            self.start.configure(fg_color="#F4EAFF", text_color="black")
-            self.pause_button.configure(fg_color="#9875BD", text_color="white")
-            self.reset.configure(fg_color="#3C007A", text_color="white")
+            self.start.configure(fg_color="#F4EAFF", text_color="black", hover_color="#e2c8ff")
+            self.pause_button.configure(fg_color="#9875BD", text_color="white", hover_color="#8d67b6")
+            self.reset.configure(fg_color="#3C007A", text_color="white", hover_color="#290053")
         if self.r.get() == 1:
-            self.start.configure(fg_color="#DAECFE", text_color="black")
-            self.pause_button.configure(fg_color="#6D94BC", text_color="black")
-            self.reset.configure(fg_color="#003C7A", text_color="black")
+            self.start.configure(fg_color="#DAECFE", text_color="black", hover_color="#acd4fd")
+            self.pause_button.configure(fg_color="#6D94BC", text_color="black", hover_color="#5985b3")
+            self.reset.configure(fg_color="#003C7A", text_color="black", hover_color="#003163")
 
 
 
@@ -144,6 +149,8 @@ class Timer(CTkToplevel):
         self.i = False
         self.pause_button.configure(text="Pause.")
 
+
+
     def cache(self):
         self.commits += 1
         if self.r.get() == 1:
@@ -158,3 +165,24 @@ class Timer(CTkToplevel):
 
     def on_close(self):
         self.root.destroy()
+
+    def popup(self):
+        self.attributes('-topmost', 1)
+        self.attributes('-topmost', 0)
+        self.focus_force()
+        self.lift()
+        self.deiconify()
+        winsound.MessageBeep()
+        color = "blue"
+        hover_color= "gray"
+        if self.r.get() == 1:
+            color = "#6D94BC"
+            hover_color = "#c5d4e4"
+        if self.r.get() == 2:
+            color = "#9875BD"
+            hover_color = "#d6c8e5"
+        mess = CTkMessagebox(master=self,title="Save?",message="Close the timer, so your progress is uploaded.",
+                             option_1="Ok", icon_size=(1,1), button_color=color,fade_in_duration=1,
+                             cancel_button=None, fg_color="#464646", bg_color=GRAY, width=150, height=80, font=("Work Sans", 12, "normal"),button_hover_color=hover_color)
+        if mess.get() == "Ok":
+            self.root.destroy()
