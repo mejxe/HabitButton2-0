@@ -31,7 +31,7 @@ class Select:
                                fg_color="#0055ab", command=lambda *args: self.return_endpoint('math'), hover_color="dark blue", corner_radius=10)
         self.math.grid(column=3, row=1, padx=5, pady=10)
 
-        self.auto = CTkButton(self.root, command=self.open_timer, width=20, height=20, text="1 Hour", font=FONT, bg_color=GRAY,
+        self.auto = CTkButton(self.root, command=self.open_timer, width=20, height=20, text="Timer", font=FONT, bg_color=GRAY,
                                fg_color="#7D1935", hover_color="#480e1f", corner_radius=10)
         self.auto.grid(column=2, row=2, columnspan=1)
 

@@ -22,6 +22,8 @@ class Timer(CTkToplevel):
         self.iters = -1
         self.root = root
         self.commits = 0
+        self.reps = 0
+        self.pomodoros = 0
         self.ret = None
         self.wm_protocol("WM_DELETE_WINDOW", self.on_close)
         self.resizable(False,False)
@@ -32,17 +34,18 @@ class Timer(CTkToplevel):
         self.frame.pack(pady=20)
         # Timer widget
         self.clock = CTkLabel(self.frame, text="00:00:00", font=FONT, bg_color="#464646", fg_color="#464646")
-        #self.clock.grid(row=0, column=1, columnspan=2, pady=20, sticky="e")
         self.clock.place(x=200, y=70, anchor="center")
+        self.br = CTkLabel(self.frame,text="break.", font=("Work Sans", 13, "normal"))
+        self.wk = CTkLabel(self.frame,text="work.", font=("Work Sans", 13, "normal"))
         # Timer Buttons
 
         # start/stop
-        self.start = CTkButton(self.frame, width=70, height=35, text="Start.", font=BFONT, corner_radius=10, fg_color="#A619D5", command=self.start_count, state="disabled", hover_color="#17005f", text_color="black")
-        #self.start.grid(row=1, column=1,sticky="e", padx=10)
+        self.start = CTkButton(self.frame, width=70, height=35, text="Start.", command=self.deafult, font=BFONT, corner_radius=10, fg_color="#A619D5", state="disabled", hover_color="#17005f", text_color="black")
+
         self.start.place(x=100, y=150, anchor="center")
         # reset
         self.reset = CTkButton(self.frame, width=70, height=35, text="Reset.", font=BFONT, corner_radius=10, fg_color="#40045A", state="disabled",hover_color="#8a09c2", command=self.over, text_color="black")
-        #self.reset.grid(row=1, column=2, sticky="w")
+
         self.reset.place(x=300, y=150, anchor="center")
 
         self.pause_button = CTkButton(self.frame, width=70, height=35, text="Pause.", font=BFONT, corner_radius=10, fg_color="#6D0D91", state="disabled",hover_color="#b016ea", command=self.pause, text_color="black")
@@ -57,51 +60,77 @@ class Timer(CTkToplevel):
         self.check.place(x=150, y=220, anchor="center")
         self.check2.place(x=270, y=220, anchor="center")
 
+
+        self.var = IntVar()
+        self.pomodoro_switch = CTkSwitch(self.frame, text="Timer", font=CFONT, button_color="#A619D5", button_hover_color="#8a09c2", progress_color="#40045A", onvalue=1, offvalue=0, variable=self.var, command=self.pomodoro)
+        self.pomodoro_switch.place(x=150, y=250)
+
+        self.pomodoro_done = CTkLabel(self.frame,text_color="#AA5656", text="", font=(CTkFont(size=16)))
+
         self.mainloop()
 
     def start_count(self):
-        self.strftime = 3600
-        print(self.strftime)
         self.pause_button.configure(state="normal")
         self.reset.configure(state="normal")
         self.start.configure(state="disabled")
         self.check.configure(state="disabled")
         self.check2.configure(state="disabled")
         self.i = False
-        self.counter()
-    def counter(self):
+        self.iters = 0
+        self.pomodoro_switch.configure(state="disabled")
+
+    def deafult(self):
+        self.start_count()
+        self.counter(2)
+
+    def counter(self, time):
         # time assessment
-        self.strftime = self.strftime - 1
+        self.strftime = time
         hours = math.floor(self.strftime/3600)
         minutes = math.floor(self.strftime/60)
         seconds = self.strftime % 60
         minutes_not_formatted = minutes
-        print(minutes_not_formatted)
         # time formatting
-        if hours == 0:
-            hours = "00"
+        if hours < 10:
+            hours = f"0{hours}"
         if minutes < 10:
             minutes = f"0{minutes}"
         if seconds < 10:
             seconds = f"0{seconds}"
-
-        self.clock.configure(text=f"{hours}:{minutes}:{seconds}")
+        if self.var.get() == 0:
+            self.clock.configure(text=f"{hours}:{minutes}:{seconds}")
+        if self.var.get() == 1:
+            self.clock.configure(text=f"{minutes}:{seconds}")
+        print("siema", self.strftime)
 
         # begin
-        self.after_id = self.after(1000, self.counter)
+        if self.strftime > 0:
+            self.after_id = self.after(1000, self.counter, self.strftime-1)
+
+        # POMODORO
+        if self.var.get() == 1:
+            if self.reps <= 8:
+                if self.strftime <= 0:
+                    self.pomodoro_count()
+            else:
+                self.over()
+                self.popup()
 
         # color change every 10 minutes
-        if minutes_not_formatted % 10 == 0 and minutes_not_formatted != 0:
-            self.color_change()
+        if self.var.get() == 0:
+            if minutes_not_formatted % 10 == 0 and minutes_not_formatted != 0:
+                self.color_change()
+
 
 
         # over
-        if not self.strftime >= 0:
-            self.over()
-            self.popup()
+        if self.var.get() == 0:
+            if not self.strftime > 0:
+                self.over()
+                self.popup()
 
-        if self.strftime == 60:
-            self.cache()
+            if self.strftime == 60:
+                self.cache(1)
 
     # enable/disable start button
     def enable(self):
@@ -124,7 +153,7 @@ class Timer(CTkToplevel):
             self.after_cancel(self.after_id)
             self.pause_button.configure(text="Resume.")
         else:
-            self.after_id = self.after(1000, self.counter)
+            self.after_id = self.after(1000, self.counter, self.strftime-1)
             self.pause_button.configure(text="Pause.")
 
     def color_change(self):
@@ -139,7 +168,10 @@ class Timer(CTkToplevel):
 
     def over(self):
         self.after_cancel(self.after_id)
-        self.clock.configure(text="00:00:00", text_color="white")
+        if self.var.get() == 0:
+            self.clock.configure(text="00:00:00", text_color="white")
+        else:
+            self.clock.configure(text="00:00", text_color="white")
         self.start.configure(fg_color="#A619D5")
         self.pause_button.configure(fg_color="#6D0D91")
         self.reset.configure(fg_color="#40045A")
@@ -148,11 +180,11 @@ class Timer(CTkToplevel):
         self.reset.configure(state="disabled")
         self.i = False
         self.pause_button.configure(text="Pause.")
+        self.wk.place(x=9999,y=9999)
+        self.br.place(x=9999,y=0)
 
-
-
-    def cache(self):
-        self.commits += 1
+    def cache(self, commits):
+        self.commits += commits
         if self.r.get() == 1:
             print("math")
             self.ret = "math"
@@ -186,3 +218,51 @@ class Timer(CTkToplevel):
                              cancel_button=None, fg_color="#464646", bg_color=GRAY, width=150, height=80, font=("Work Sans", 12, "normal"),button_hover_color=hover_color)
         if mess.get() == "Ok":
             self.root.destroy()
+
+    def pomodoro(self):
+        if self.var.get() == 0:
+            self.pomodoro_switch.configure(text="Timer", button_color="#A619D5", progress_color="#40045A", button_hover_color="#8a09c2")
+            self.clock.configure(text="00:00:00")
+            self.start.configure(command=self.deafult)
+            self.br.place(x=99999, y=50)
+            self.wk.place(x=99999, y=70)
+            self.pomodoro_done.place(x=9999, y=9999)
+
+        if self.var.get() == 1:
+            self.pomodoro_switch.configure(text="Pomodoro",button_color="#AA5656",progress_color="#874444", button_hover_color='#5f3030')
+            self.clock.configure(text="00:00")
+            self.start.configure(command=self.pomodoro_count)
+            self.br.place(x=300,y=50)
+            self.wk.place(x=302, y=70)
+            self.pomodoro_done.place(x=75, y=55)
+
+    def pomodoro_count(self):
+        if self.reps % 2 == 0:
+            self.wk.configure(text_color="#AA5656")
+            self.br.configure(text_color="white")
+            self.start_count()
+            self.counter(1800)
+        elif self.reps % 2 != 0:
+            if self.reps == 3:
+                self.cache(1)
+            if self.reps % 7 == 0 and self.reps != 0:
+                self.cache(1)
+                self.counter(1200)
+                self.wk.configure(text_color="white")
+                self.br.configure(text_color="#AA5656")
+                self.pomodoros +=1
+            else:
+                self.counter(300)
+                self.wk.configure(text_color="white")
+                self.br.configure(text_color="#AA5656")
+                self.pomodoros += 1
+
+        if self.pomodoros == 1:
+            self.pomodoro_done.configure(text="✓")
+        if self.pomodoros == 2:
+            self.pomodoro_done.configure(text="✓ ✓")
+        if self.pomodoros == 3:
+            self.pomodoro_done.configure(text="✓ ✓\n✓")
+        if self.pomodoros == 4:
+            self.pomodoro_done.configure(text="✓ ✓\n✓ ✓")
+        self.reps += 1
