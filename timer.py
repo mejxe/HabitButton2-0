@@ -62,7 +62,7 @@ class Timer(CTkToplevel):
 
 
         self.var = IntVar()
-        self.pomodoro_switch = CTkSwitch(self.frame, text="Timer", font=CFONT, button_color="#A619D5", button_hover_color="#8a09c2", progress_color="#40045A", onvalue=1, offvalue=0, variable=self.var, command=self.pomodoro)
+        self.pomodoro_switch = CTkSwitch(self.frame, text="Timer", font=CFONT, button_color="#A619D5", button_hover_color="#8a09c2", progress_color="#40045A", onvalue=1, offvalue=0, variable=self.var, command=self.pomodoro, state="disabled")
         self.pomodoro_switch.place(x=150, y=250)
 
         self.pomodoro_done = CTkLabel(self.frame,text_color="#AA5656", text="", font=(CTkFont(size=16)))
@@ -81,7 +81,7 @@ class Timer(CTkToplevel):
 
     def deafult(self):
         self.start_count()
-        self.counter(2)
+        self.counter(3065)
 
     def counter(self, time):
         # time assessment
@@ -90,6 +90,7 @@ class Timer(CTkToplevel):
         minutes = math.floor(self.strftime/60)
         seconds = self.strftime % 60
         minutes_not_formatted = minutes
+        seconds_not_formatted = seconds
         # time formatting
         if hours < 10:
             hours = f"0{hours}"
@@ -101,7 +102,7 @@ class Timer(CTkToplevel):
             self.clock.configure(text=f"{hours}:{minutes}:{seconds}")
         if self.var.get() == 1:
             self.clock.configure(text=f"{minutes}:{seconds}")
-        print("siema", self.strftime)
+        print("seconds", seconds_not_formatted, "minutes", minutes_not_formatted)
 
         # begin
         if self.strftime > 0:
@@ -118,7 +119,8 @@ class Timer(CTkToplevel):
 
         # color change every 10 minutes
         if self.var.get() == 0:
-            if minutes_not_formatted % 10 == 0 and minutes_not_formatted != 0:
+            if minutes_not_formatted % 10 == 0 and minutes_not_formatted != 0 and seconds_not_formatted == 0:
+                print(minutes_not_formatted)
                 self.color_change()
 
 
@@ -136,14 +138,29 @@ class Timer(CTkToplevel):
     def enable(self):
         if self.r.get() != 0:
             self.start.configure(state="normal")
+            self.pomodoro_switch.configure(state="normal")
+            # CODE
         if self.r.get() == 2:
-            self.start.configure(fg_color="#F4EAFF", text_color="black", hover_color="#e2c8ff")
-            self.pause_button.configure(fg_color="#9875BD", text_color="white", hover_color="#8d67b6")
-            self.reset.configure(fg_color="#3C007A", text_color="white", hover_color="#290053")
+            if self.var.get() == 0:
+                self.start.configure(fg_color="#F4EAFF", text_color="black", hover_color="#e2c8ff")
+                self.pause_button.configure(fg_color="#9875BD", text_color="white", hover_color="#8d67b6")
+                self.reset.configure(fg_color="#3C007A", text_color="white", hover_color="#290053")
+            if self.var.get() == 1:
+                self.start.configure(fg_color="#FF6347", hover_color="#7c1300")
+                self.pause_button.configure(fg_color="#931600", hover_color="#6d1000")
+                self.reset.configure(fg_color="#510c00", hover_color="#350800")
+
+
+            # MATH
         if self.r.get() == 1:
-            self.start.configure(fg_color="#DAECFE", text_color="black", hover_color="#acd4fd")
-            self.pause_button.configure(fg_color="#6D94BC", text_color="black", hover_color="#5985b3")
-            self.reset.configure(fg_color="#003C7A", text_color="black", hover_color="#003163")
+            if self.var.get() == 0:
+                self.start.configure(fg_color="#DAECFE", text_color="black", hover_color="#acd4fd")
+                self.pause_button.configure(fg_color="#6D94BC", text_color="black", hover_color="#5985b3")
+                self.reset.configure(fg_color="#003C7A", text_color="black", hover_color="#003163")
+            if self.var.get() == 1:
+                self.start.configure(fg_color="#b88388", hover_color="#a66369")
+                self.pause_button.configure(fg_color="#a7656b", hover_color='#8f5257')
+                self.reset.configure(fg_color="#78454a", hover_color='#60373b')
 
 
 
@@ -182,6 +199,7 @@ class Timer(CTkToplevel):
         self.pause_button.configure(text="Pause.")
         self.wk.place(x=9999,y=9999)
         self.br.place(x=9999,y=0)
+        self.pomodoro_switch.configure(state="normal")
 
     def cache(self, commits):
         self.commits += commits
@@ -221,15 +239,42 @@ class Timer(CTkToplevel):
 
     def pomodoro(self):
         if self.var.get() == 0:
+            self.check.configure(fg_color="#0055ab", hover_color="#0055ab")
+            self.check2.configure(fg_color="#3c007a", hover_color="#3c007a")
             self.pomodoro_switch.configure(text="Timer", button_color="#A619D5", progress_color="#40045A", button_hover_color="#8a09c2")
             self.clock.configure(text="00:00:00")
             self.start.configure(command=self.deafult)
             self.br.place(x=99999, y=50)
             self.wk.place(x=99999, y=70)
             self.pomodoro_done.place(x=9999, y=9999)
+            # MATH
+            if self.r.get() == 1:
+                self.start.configure(fg_color="#DAECFE", text_color="black", hover_color="#acd4fd")
+                self.pause_button.configure(fg_color="#6D94BC", text_color="black", hover_color="#5985b3")
+                self.reset.configure(fg_color="#003C7A", text_color="black", hover_color="#003163")
+                # CODE
+            if self.r.get() == 2:
+                self.start.configure(fg_color="#F4EAFF", text_color="black", hover_color="#e2c8ff")
+                self.pause_button.configure(fg_color="#9875BD", text_color="white", hover_color="#8d67b6")
+                self.reset.configure(fg_color="#3C007A", text_color="white", hover_color="#290053")
 
         if self.var.get() == 1:
-            self.pomodoro_switch.configure(text="Pomodoro",button_color="#AA5656",progress_color="#874444", button_hover_color='#5f3030')
+            self.check.configure(fg_color="#b88388", hover_color="#a66369")
+            self.check2.configure(fg_color="#FF6347", hover_color="#7c1300")
+            self.pomodoro_switch.configure(text="Pomodoro", button_color="#AA5656", progress_color="#874444", button_hover_color='#5f3030')
+            # MATH COLORS
+            if self.r.get() == 1:
+                self.start.configure(fg_color="#b88388", hover_color="#a66369")
+                self.pause_button.configure(fg_color="#a7656b", hover_color='#8f5257')
+                self.reset.configure(fg_color="#78454a", hover_color='#60373b')
+            ###
+            # CODE COLORS
+            if self.r.get() == 2:
+                self.start.configure(fg_color="#FF6347", hover_color="#7c1300")
+                self.pause_button.configure(fg_color="#931600", hover_color="#6d1000")
+                self.reset.configure(fg_color="#510c00", hover_color="#350800")
+
+            ###
             self.clock.configure(text="00:00")
             self.start.configure(command=self.pomodoro_count)
             self.br.place(x=300,y=50)
