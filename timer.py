@@ -40,7 +40,7 @@ class Timer(CTkToplevel):
         self.wk = CTkLabel(self.frame,text="work.", font=("Work Sans", 13, "normal"))
         # TODO: Slider to change timer hours
         self.slider_var = IntVar(value=1)
-        self.hour_slider = CTkSlider(self.frame, orientation="vertical", from_=1, to=10, number_of_steps=9, command=self.set_time, height=100, button_color="#A619D5", button_hover_color="#17005f", variable=self.slider_var)
+        self.hour_slider = CTkSlider(self.frame, orientation="vertical", from_=1, to=10, number_of_steps=9, command=self.set_time, height=100, button_color="#A619D5", button_hover_color="#e2c8ff", variable=self.slider_var)
         self.hour_slider.place(x=360, y=30)
         # TODO 2: progress bar for coolness
         self.progress = CTkProgressBar(self.frame, determinate_speed=.83, progress_color="gray")
@@ -95,6 +95,7 @@ class Timer(CTkToplevel):
         self.deafult_time = int(slider_time) * 3600
         print(slider_time)
         self.clock.configure(text=f"{int(slider_time):02}:00:00")
+
     def counter(self, time):
         # time assessment
         self.strftime = time
