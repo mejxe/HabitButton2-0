@@ -80,8 +80,5 @@ class Gui:
 
     def on_close(self):
         self.pixela.create_pixel(self.yesterday_var.get())
-        self.return_label.configure(text=self.pixela.response)
-        self.button.configure(text=self.pixela.response)
-        time.sleep(3)
         self.root.destroy()
 

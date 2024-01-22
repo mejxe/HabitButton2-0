@@ -4,7 +4,7 @@ import json
 import os
 
 class Pixela:
-    def __init__(self,graph_endpoint, graph_name):
+    def __init__(self,graph_endpoint, graph_name, auto_commits=0):
         self.username = "mejxe"
         self.token = os.environ.get("token")
         self.graph_data = {
@@ -21,6 +21,7 @@ class Pixela:
             "X-USER-TOKEN": self.token
         }
         self.date_now = datetime.datetime.strftime(datetime.date.today(), "%Y%m%d")
+        self.auto_commits = auto_commits
         # PIXEL ATTRIBUTES
 
 
@@ -52,9 +53,11 @@ class Pixela:
                                     break
                                 else: raise Exception(TimeoutError)
 
+        if self.auto_commits != 0:
+            self.quantity = int(self.quantity)+self.auto_commits
         with open('commits.json', "r") as data_file:
             data = json.load(data_file)
-            data_to_update = {self.graph_name:self.quantity}
+            data_to_update = {self.graph_name: int(self.quantity)}
             data.update(data_to_update)
         with open('commits.json', "w") as data_file:
             json.dump(data, data_file, indent=2)
