@@ -35,8 +35,7 @@ class Select:
                                fg_color="#7D1935", hover_color="#480e1f", corner_radius=10)
         self.auto.grid(column=2, row=2, columnspan=1)
 
-        self.study.bind("<Button-1>", lambda *args: self.return_endpoint('study'))
-        self.study.bind("<Button-3>", lambda *args: self.go_to('study'))
+        self.study.bind("<Button-1>", lambda *args: self.go_to('study'))
 
         self.code.bind("<Button-1>", lambda *args: self.return_endpoint('code'))
         self.code.bind("<Button-3>", lambda *args: self.go_to('code'))

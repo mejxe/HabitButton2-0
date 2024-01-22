@@ -28,6 +28,7 @@ class Timer(CTkToplevel):
         self.wm_protocol("WM_DELETE_WINDOW", self.on_close)
         self.resizable(False,False)
 
+
         # Frame
 
         self.frame = CTkFrame(self, width=400, height=300, bg_color='#464646', fg_color="#464646")
@@ -37,6 +38,14 @@ class Timer(CTkToplevel):
         self.clock.place(x=200, y=70, anchor="center")
         self.br = CTkLabel(self.frame,text="break.", font=("Work Sans", 13, "normal"))
         self.wk = CTkLabel(self.frame,text="work.", font=("Work Sans", 13, "normal"))
+        # TODO: Slider to change timer hours
+        self.slider_var = IntVar(value=1)
+        self.hour_slider = CTkSlider(self.frame, orientation="vertical", from_=1, to=10, number_of_steps=9, command=self.set_time, height=100, button_color="#A619D5", button_hover_color="#17005f", variable=self.slider_var)
+        self.hour_slider.place(x=360, y=30)
+        # TODO 2: progress bar for coolness
+        self.progress = CTkProgressBar(self.frame, determinate_speed=.83, progress_color="gray")
+        self.progress.place(x=100, y=25)
+        self.progress.set(0)
         # Timer Buttons
 
         # start/stop
@@ -60,13 +69,12 @@ class Timer(CTkToplevel):
         self.check.place(x=150, y=220, anchor="center")
         self.check2.place(x=270, y=220, anchor="center")
 
-
         self.var = IntVar()
         self.pomodoro_switch = CTkSwitch(self.frame, text="Timer", font=CFONT, button_color="#A619D5", button_hover_color="#8a09c2", progress_color="#40045A", onvalue=1, offvalue=0, variable=self.var, command=self.pomodoro, state="disabled")
         self.pomodoro_switch.place(x=150, y=250)
 
         self.pomodoro_done = CTkLabel(self.frame,text_color="#AA5656", text="", font=(CTkFont(size=16)))
-
+        self.set_time()
         self.mainloop()
 
     def start_count(self):
@@ -81,25 +89,23 @@ class Timer(CTkToplevel):
 
     def deafult(self):
         self.start_count()
-        self.counter(3065)
+        self.counter(self.deafult_time)
 
+    def set_time(self, slider_time=1):
+        self.deafult_time = int(slider_time) * 3600
+        print(slider_time)
+        self.clock.configure(text=f"{int(slider_time):02}:00:00")
     def counter(self, time):
         # time assessment
         self.strftime = time
+        self.progress.step()
         hours = math.floor(self.strftime/3600)
-        minutes = math.floor(self.strftime/60)
+        minutes = int(self.strftime/60) % 60
         seconds = self.strftime % 60
         minutes_not_formatted = minutes
         seconds_not_formatted = seconds
-        # time formatting
-        if hours < 10:
-            hours = f"0{hours}"
-        if minutes < 10:
-            minutes = f"0{minutes}"
-        if seconds < 10:
-            seconds = f"0{seconds}"
         if self.var.get() == 0:
-            self.clock.configure(text=f"{hours}:{minutes}:{seconds}")
+            self.clock.configure(text=f"{hours:02}:{minutes:02}:{seconds:02}")
         if self.var.get() == 1:
             self.clock.configure(text=f"{minutes}:{seconds}")
         print("seconds", seconds_not_formatted, "minutes", minutes_not_formatted)
@@ -131,8 +137,8 @@ class Timer(CTkToplevel):
                 self.over()
                 self.popup()
 
-            if self.strftime == 60:
-                self.cache(1)
+            if self.strftime == 1:
+                self.cache(self.deafult_time/3600)
 
     # enable/disable start button
     def enable(self):
@@ -145,6 +151,7 @@ class Timer(CTkToplevel):
                 self.start.configure(fg_color="#F4EAFF", text_color="black", hover_color="#e2c8ff")
                 self.pause_button.configure(fg_color="#9875BD", text_color="white", hover_color="#8d67b6")
                 self.reset.configure(fg_color="#3C007A", text_color="white", hover_color="#290053")
+                self.hour_slider.configure(button_color="#9875BD", button_hover_color="#8d67b6", progress_color="#290053")
             if self.var.get() == 1:
                 self.start.configure(fg_color="#FF6347", hover_color="#7c1300")
                 self.pause_button.configure(fg_color="#931600", hover_color="#6d1000")
@@ -157,6 +164,7 @@ class Timer(CTkToplevel):
                 self.start.configure(fg_color="#DAECFE", text_color="black", hover_color="#acd4fd")
                 self.pause_button.configure(fg_color="#6D94BC", text_color="black", hover_color="#5985b3")
                 self.reset.configure(fg_color="#003C7A", text_color="black", hover_color="#003163")
+                self.hour_slider.configure(button_color="#DAECFE", button_hover_color="#acd4fd", progress_color="#003C7A")
             if self.var.get() == 1:
                 self.start.configure(fg_color="#b88388", hover_color="#a66369")
                 self.pause_button.configure(fg_color="#a7656b", hover_color='#8f5257')
@@ -174,13 +182,17 @@ class Timer(CTkToplevel):
             self.pause_button.configure(text="Pause.")
 
     def color_change(self):
-        self.iters += 1
+        if self.iters == 6:
+            self.iters = 0
+        else:
+            self.iters += 1
         colors = []
         if self.r.get() == 1:
             colors = colors_math
         if self.r.get() == 2:
             colors = colors_code
         self.clock.configure(text_color=colors[self.iters])
+        self.progress.configure(progress_color=colors[self.iters])
 
 
     def over(self):
@@ -200,6 +212,7 @@ class Timer(CTkToplevel):
         self.wk.place(x=9999,y=9999)
         self.br.place(x=9999,y=0)
         self.pomodoro_switch.configure(state="normal")
+        self.progress.set(0)
 
     def cache(self, commits):
         self.commits += commits
@@ -247,6 +260,7 @@ class Timer(CTkToplevel):
             self.br.place(x=99999, y=50)
             self.wk.place(x=99999, y=70)
             self.pomodoro_done.place(x=9999, y=9999)
+            self.hour_slider.place(x=360, y=30)
             # MATH
             if self.r.get() == 1:
                 self.start.configure(fg_color="#DAECFE", text_color="black", hover_color="#acd4fd")
@@ -280,14 +294,17 @@ class Timer(CTkToplevel):
             self.br.place(x=300,y=50)
             self.wk.place(x=302, y=70)
             self.pomodoro_done.place(x=75, y=55)
+            self.hour_slider.place(x=9999, y=9990)
 
     def pomodoro_count(self):
         if self.reps % 2 == 0:
+            self.top()
             self.wk.configure(text_color="#AA5656")
             self.br.configure(text_color="white")
             self.start_count()
             self.counter(1800)
         elif self.reps % 2 != 0:
+            self.top()
             if self.reps == 3:
                 self.cache(1)
             if self.reps % 7 == 0 and self.reps != 0:
@@ -311,3 +328,11 @@ class Timer(CTkToplevel):
         if self.pomodoros == 4:
             self.pomodoro_done.configure(text="✓ ✓\n✓ ✓")
         self.reps += 1
+
+    def top(self):
+        self.attributes('-topmost', 1)
+        self.attributes('-topmost', 0)
+        self.focus_force()
+        self.lift()
+        self.deiconify()
+        winsound.MessageBeep()
