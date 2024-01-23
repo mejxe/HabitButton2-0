@@ -3,7 +3,7 @@ import random
 import string
 import json
 import CTkMessagebox
-import time
+
 
 FONT = ("Work Sans Light", 40, "normal")
 BFONT = ("Work Sans", 15, "normal")
