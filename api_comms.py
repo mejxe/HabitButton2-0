@@ -71,7 +71,6 @@ class Pixela:
 
     def create_pixel(self, yesterday):
         print(self.quantity)
-        print(yesterday)
         if yesterday == "on":
             print('yesterday')
             self.date_now = datetime.datetime.strftime(datetime.date.today().replace(day=datetime.datetime.today().day - 1), "%Y%m%d")
@@ -152,6 +151,18 @@ class Pixela:
                 print("Success")
                 break
         self.quantity = 0
+
+# CLEAR TIMER COMMITS DATA
+    def clear_timer(self):
+        with open("timer_commits.json", "r") as dataload:
+            data = json.load(dataload)
+            clear_commits = {
+                self.graph_name: 0,
+                           }
+            data.update(clear_commits)
+        # update data
+        with open("timer_commits.json", "w") as loaddata:
+            json.dump(data, loaddata, indent=4)
 
 
     def quantity_up(self):
