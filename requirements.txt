@@ -7,3 +7,4 @@ idna==3.4
 packaging==23.2
 pip==23.2.1
 urllib3==2.1.0
+CTkMessagebox~=2.5

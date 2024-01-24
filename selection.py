@@ -1,9 +1,17 @@
+import json
+
 from customtkinter import *
 import webbrowser
 from timer import Timer
+from api_comms import Pixela
+from gui import Gui
 
 GRAY = "#303030"
 FONT = ("Work Sans", 15, "normal")
+graph_endpoints = {"study": "https://pixe.la/v1/users/mejxe/graphs/studygraph",
+                   "math": "https://pixe.la/v1/users/mejxe/graphs/mathgraph",
+                   "code": "https://pixe.la/v1/users/mejxe/graphs/codegraph"}
+
 
 class Select:
     def __init__(self):
@@ -23,12 +31,12 @@ class Select:
 
 
         self.code = CTkButton(self.root, width=50, height=25, text="Code", font=FONT, bg_color=GRAY,
-                               fg_color="#3c007a", command=lambda *args: self.return_endpoint('code'), hover_color = '#2A0944', corner_radius=10)
+                               fg_color="#3c007a", command=lambda *args: self.connect_endpoint('code'), hover_color = '#2A0944', corner_radius=10)
         self.code.grid(column=2, row=1, padx=5, pady=5)
 
 
         self.math = CTkButton(self.root, width=50, height=25, text="Math", font=FONT, bg_color=GRAY,
-                               fg_color="#0055ab", command=lambda *args: self.return_endpoint('math'), hover_color="dark blue", corner_radius=10)
+                               fg_color="#0055ab", command=lambda *args: self.connect_endpoint('math'), hover_color="dark blue", corner_radius=10)
         self.math.grid(column=3, row=1, padx=5, pady=10)
 
         self.auto = CTkButton(self.root, command=self.open_timer, width=20, height=20, text="Timer", font=FONT, bg_color=GRAY,
@@ -37,40 +45,41 @@ class Select:
 
         self.study.bind("<Button-1>", lambda *args: self.go_to('study'))
 
-        self.code.bind("<Button-1>", lambda *args: self.return_endpoint('code'))
+        self.code.bind("<Button-1>", lambda *args: self.connect_endpoint('code'))
         self.code.bind("<Button-3>", lambda *args: self.go_to('code'))
 
-        self.math.bind("<Button-1>", lambda *args: self.return_endpoint('math'))
+        self.math.bind("<Button-1>", lambda *args: self.connect_endpoint('math'))
         self.math.bind("<Button-3>", lambda *args: self.go_to('math'))
 
 
         self.root.mainloop()
 
-    def return_endpoint(self, endpoint):
-        self.selection = endpoint
-        self.root.destroy()
-        self.root.quit()
+    def connect_endpoint(self, endpoint):
+        with open("timer_commits.json", "r") as loaddata:
+            data = json.load(loaddata)
+        self.pixela = Pixela(graph_endpoints[endpoint], graph_name=endpoint, auto_commits=data[endpoint])
+        self.quantity = self.pixela.get_pixel_attributes()
+        self.open_button_gui()
+
+    def open_button_gui(self):
+        gui = Gui(int(self.quantity), pixela=self.pixela)
+
 
 
     def send_select(self):
         return self.selection
 
     def go_to(self, web):
-        endpoints = {
-            "study": "https://pixe.la/v1/users/mejxe/graphs/studygraph.html",
-            "math": "https://pixe.la/v1/users/mejxe/graphs/mathgraph.html",
-            "code": "https://pixe.la/v1/users/mejxe/graphs/codegraph.html"
-        }
-        webbrowser.open(endpoints[web])
+        webbrowser.open(graph_endpoints[web])
 
     # POMODORO
     def open_timer(self):
-
-        endpoints = [
-            "study", "math", "code"
-        ]
-        self.timer = Timer(endpoints, self.root)
-        if self.timer.commits > 0:
-            self.selection = self.timer.ret
-            self.auto_commits = self.timer.commits
+        self.timer = Timer(graph_endpoints.keys(), self.root)
+        if not self.timer.winfo_exists():
+            with open("timer_commits.json", "r") as dataload:
+                data = json.load(dataload)
+                if int(data["math"]) != 0:
+                    self.connect_endpoint("math")
+                elif int(data["code"]) != 0:
+                    self.connect_endpoint("code")
 
