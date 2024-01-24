@@ -83,8 +83,6 @@ class Timer(CTkToplevel):
         self.reset = CTkButton(self.frame, width=70, height=35, text="Reset.", font=BFONT, corner_radius=10, fg_color="#40045A", state="disabled",hover_color="#8a09c2", command=self.over, text_color="black")
 
         self.reset.place(x=300, y=150, anchor="center")
-        if int(TIME_NOT_FINISHED) != 0:
-            self.reset.configure(state="normal")
         self.pause_button = CTkButton(self.frame, width=70, height=35, text="Pause.", font=BFONT, corner_radius=10, fg_color="#6D0D91", state="disabled",hover_color="#b016ea", command=self.pause, text_color="black")
         self.pause_button.place(x=200, y=150, anchor="center")
         # graph

@@ -70,7 +70,10 @@ class Select:
         return self.selection
 
     def go_to(self, web):
-        webbrowser.open(graph_endpoints[web])
+        endpoints= {"study": "https://pixe.la/v1/users/mejxe/graphs/studygraph.html",
+                    "math": "https://pixe.la/v1/users/mejxe/graphs/mathgraph.html",
+                    "code": "https://pixe.la/v1/users/mejxe/graphs/codegraph.html"}
+        webbrowser.open(endpoints[web])
 
     # POMODORO
     def open_timer(self):
