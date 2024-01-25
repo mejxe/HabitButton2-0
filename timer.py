@@ -9,20 +9,20 @@ colors_code = ['#f4eaff','#d8b1fe','#bf80ff','#a247ff','#860eff',
                            "#6d00dc",'#5500ab','#3c007a','#240049','#080010']
 colors_math = ['#daecfe','#a9d3ff','#78bbff','#47a2ff','#168aff',
                    '#006ad5','#0055ab','#003c7a','#002449','#000c18']
+
+def lmao():
+    with open("timer_commits.json", "w") as data:
+        dr = {"math": 0,
+              "code": 0}
+        json.dump(dr, data)
+
 try:
     with open("timer_commits.json")as f:
         if f.read() == "":
-            pass
-    with open("timer_commits.json", "w") as data:
-        dr = {"math":0,
-              "code":0}
-        json.dump(dr, data)
+            lmao()
 
 except FileNotFoundError:
-    with open("timer_commits.json", "w") as data:
-        dr = {"math":0,
-              "code":0}
-        json.dump(dr, data)
+    lmao()
 
 
 FONT = ("Work Sans Light", 70, "normal")
@@ -283,13 +283,14 @@ class Timer(CTkToplevel):
 
 
     def on_close(self):
-        try:
-            if self.commits == 0:
+        if self.var.get() == 0:
+            try:
+                if self.commits == 0:
+                    with open("time.txt", "w+") as f:
+                        f.write(str(self.strftime))
+            except AttributeError:
                 with open("time.txt", "w+") as f:
-                    f.write(str(self.strftime))
-        except AttributeError:
-            with open("time.txt", "w+") as f:
-                f.write("0")
+                    f.write("0")
         self.quit()
         self.destroy()
 

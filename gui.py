@@ -81,5 +81,6 @@ class Gui(CTkToplevel):
     def on_close(self):
         self.pixela.create_pixel(self.yesterday_var.get())
         self.pixela.clear_timer()
+        self.quit()
         self.destroy()
 

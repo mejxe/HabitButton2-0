@@ -45,10 +45,10 @@ class Select:
 
         self.study.bind("<Button-1>", lambda *args: self.go_to('study'))
 
-        self.code.bind("<Button-1>", lambda *args: self.connect_endpoint('code'))
+        self.code.bind("<Button-1>", lambda *args: self.connect_endpoint('code', 'code'))
         self.code.bind("<Button-3>", lambda *args: self.go_to('code'))
 
-        self.math.bind("<Button-1>", lambda *args: self.connect_endpoint('math'))
+        self.math.bind("<Button-1>", lambda *args: self.connect_endpoint('math', 'math'))
         self.math.bind("<Button-3>", lambda *args: self.go_to('math'))
 
 
@@ -57,17 +57,14 @@ class Select:
     def connect_endpoint(self, endpoint):
         with open("timer_commits.json", "r") as loaddata:
             data = json.load(loaddata)
-        self.pixela = Pixela(graph_endpoints[endpoint], graph_name=endpoint, auto_commits=data[endpoint])
-        self.quantity = self.pixela.get_pixel_attributes()
-        self.open_button_gui()
+        pixela = Pixela(graph_endpoints[endpoint], graph_name=endpoint, auto_commits=data[endpoint])
+        quantity = pixela.get_pixel_attributes()
+        self.open_button_gui(quantity=quantity, pixela=pixela)
+        return pixela
 
-    def open_button_gui(self):
-        gui = Gui(int(self.quantity), pixela=self.pixela)
+    def open_button_gui(self, quantity, pixela):
+        gui = Gui(int(quantity), pixela)
 
-
-
-    def send_select(self):
-        return self.selection
 
     def go_to(self, web):
         endpoints= {"study": "https://pixe.la/v1/users/mejxe/graphs/studygraph.html",
@@ -82,7 +79,15 @@ class Select:
             with open("timer_commits.json", "r") as dataload:
                 data = json.load(dataload)
                 if int(data["math"]) != 0:
-                    self.connect_endpoint("math")
-                elif int(data["code"]) != 0:
-                    self.connect_endpoint("code")
+                    with open("timer_commits.json", "r") as loaddata:
+                        data = json.load(loaddata)
+                    s = Pixela(graph_endpoints["math"], graph_name="math", auto_commits=data["math"])
+                    quantity = s.get_pixel_attributes()
+                    gui = Gui(int(s.quantity), pixela=s)
 
+                if int(data["code"]) != 0:
+                    with open("timer_commits.json", "r") as loaddata:
+                        data = json.load(loaddata)
+                    s2 = Pixela(graph_endpoints["code"], graph_name="code", auto_commits=data["code"])
+                    quantity = s2.get_pixel_attributes()
+                    gui2 = Gui(int(s2.quantity), pixela=s2)
