@@ -117,7 +117,6 @@ class Timer(CTkToplevel):
 
     def deafult(self):
         global TIME_NOT_FINISHED
-        self.cache(1)
         self.start_count()
         if int(TIME_NOT_FINISHED) != 0:
             self.counter(int(TIME_NOT_FINISHED))
@@ -313,7 +312,7 @@ class Timer(CTkToplevel):
                              option_1="Ok", icon_size=(1,1), button_color=color,fade_in_duration=1,
                              cancel_button=None, fg_color="#464646", bg_color=GRAY, width=150, height=80, font=("Work Sans", 12, "normal"),button_hover_color=hover_color)
         if mess.get() == "Ok":
-            self.root.destroy()
+            self.destroy()
 
     def pomodoro(self):
         if self.var.get() == 0:

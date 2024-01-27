@@ -1,5 +1,4 @@
-from api_comms import Pixela
-from gui import Gui
+
 from selection import Select
 from graph_creator import GraphCreator
 

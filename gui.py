@@ -7,7 +7,7 @@ import webbrowser
 FONT = ("Work Sans", 25, "normal")
 GRAY = "#303030"
 class Gui(CTkToplevel):
-    def __init__(self, quantity, pixela: Pixela):
+    def __init__(self, quantity, pixela: Pixela, instaclose=False):
         super().__init__()
         self.config(background=GRAY,pady=20, padx=20)
         self.geometry("250x450+960+540")
@@ -28,6 +28,7 @@ class Gui(CTkToplevel):
         self.quantity = quantity
         if self.quantity >= 19:
             self.quantity = 19
+        self.instaclose = instaclose
         self.protocol("WM_DELETE_WINDOW", self.on_close)
 
         # BUTTON
@@ -55,6 +56,8 @@ class Gui(CTkToplevel):
         self.return_label = CTkLabel(self, text="", bg_color=GRAY, font=FONT)
         self.return_label.grid(row=4, column=0, rowspan=3)
 
+        if self.instaclose:
+            self.on_close()
         self.mainloop()
 
     def color_change(self):
@@ -79,6 +82,7 @@ class Gui(CTkToplevel):
         webbrowser.open(self.pixela.graph_endpoint)
 
     def on_close(self):
+        self.withdraw()
         self.pixela.create_pixel(self.yesterday_var.get())
         self.pixela.clear_timer()
         self.quit()

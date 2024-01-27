@@ -69,7 +69,7 @@ class Pixela:
         print(graph.text)
 
 
-    def create_pixel(self, yesterday):
+    def create_pixel(self, yesterday:str):
         print(self.quantity)
         if yesterday == "on":
             print('yesterday')
