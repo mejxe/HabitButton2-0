@@ -80,7 +80,7 @@ class Timer(CTkToplevel):
 
         self.start.place(x=100, y=150, anchor="center")
         # reset
-        self.reset = CTkButton(self.frame, width=70, height=35, text="Reset.", font=BFONT, corner_radius=10, fg_color="#40045A", state="disabled",hover_color="#8a09c2", command=self.over, text_color="black")
+        self.reset = CTkButton(self.frame, width=70, height=35, text="Reset.", font=BFONT, corner_radius=10, fg_color="#40045A", state="enabled",hover_color="#8a09c2", command=self.clear_time, text_color="black")
 
         self.reset.place(x=300, y=150, anchor="center")
         self.pause_button = CTkButton(self.frame, width=70, height=35, text="Pause.", font=BFONT, corner_radius=10, fg_color="#6D0D91", state="disabled",hover_color="#b016ea", command=self.pause, text_color="black")
@@ -104,7 +104,6 @@ class Timer(CTkToplevel):
         self.pomodoro_done = CTkLabel(self.frame,text_color="#AA5656", text="", font=(CTkFont(size=16)))
         self.mainloop()
 
-
     def start_count(self):
         self.pause_button.configure(state="normal")
         self.reset.configure(state="normal")
@@ -112,6 +111,7 @@ class Timer(CTkToplevel):
         self.check.configure(state="disabled")
         self.check2.configure(state="disabled")
         self.i = False
+        self.reset.configure(command=self.over)
         self.iters = 0
         self.pomodoro_switch.configure(state="disabled")
 
@@ -125,6 +125,13 @@ class Timer(CTkToplevel):
                 f.write(str(TIME_NOT_FINISHED))
         else:
             self.counter(self.deafult_time)
+
+    def clear_time(self):
+        global TIME_NOT_FINISHED
+        TIME_NOT_FINISHED = 0
+        if self.var.get() == 0:
+            self.clock.configure(text="00:00:00")
+
 
     def set_time(self, slider_time=1):
         self.deafult_time = int(slider_time) * 3600
@@ -173,8 +180,8 @@ class Timer(CTkToplevel):
                 self.over()
                 self.popup()
 
-            if self.strftime == 1:
-                self.cache(self.deafult_time/3600)
+            if self.strftime % 3600 == 0 and self.strftime != self.deafult_time:
+                self.cache(1)
 
     # enable/disable start button
     def enable(self):
@@ -312,7 +319,7 @@ class Timer(CTkToplevel):
                              option_1="Ok", icon_size=(1,1), button_color=color,fade_in_duration=1,
                              cancel_button=None, fg_color="#464646", bg_color=GRAY, width=150, height=80, font=("Work Sans", 12, "normal"),button_hover_color=hover_color)
         if mess.get() == "Ok":
-            self.destroy()
+            self.on_close()
 
     def pomodoro(self):
         if self.var.get() == 0:
@@ -378,7 +385,7 @@ class Timer(CTkToplevel):
                 self.counter(3600)
             elif self.reps % 2 != 0:
                 self.top()
-                if self.reps == 1:
+                if self.reps == 3:
                     self.cache(1)
                 if self.reps % 3 == 0 and self.reps != 0:
                     self.cache(1)
@@ -387,11 +394,37 @@ class Timer(CTkToplevel):
                     self.br.configure(text_color="#AA5656")
                     self.pomodoros +=1
                 else:
-                    self.counter(300)
+                    self.counter(2)
                     self.wk.configure(text_color="white")
                     self.br.configure(text_color="#AA5656")
                     self.pomodoros += 1
+            if self.pomodoros == 1:
+                self.pomodoro_done.configure(text="✓✓")
+            if self.pomodoros == 2:
+                self.pomodoro_done.configure(text="✓ ✓\n✓ ✓")
 
+        if self.pomodoro_interval_var.get() == 0:
+            if self.reps % 2 == 0:
+                self.top()
+                self.wk.configure(text_color="#AA5656")
+                self.br.configure(text_color="white")
+                self.start_count()
+                self.counter(2)
+            elif self.reps % 2 != 0:
+                self.top()
+                if self.reps == 3:
+                    self.cache(1)
+                if self.reps % 7 == 0 and self.reps != 0:
+                    self.cache(1)
+                    self.counter(1200)
+                    self.wk.configure(text_color="white")
+                    self.br.configure(text_color="#AA5656")
+                    self.pomodoros += 1
+                else:
+                    self.counter(3)
+                    self.wk.configure(text_color="white")
+                    self.br.configure(text_color="#AA5656")
+                    self.pomodoros += 1
             if self.pomodoros == 1:
                 self.pomodoro_done.configure(text="✓")
             if self.pomodoros == 2:
@@ -400,35 +433,7 @@ class Timer(CTkToplevel):
                 self.pomodoro_done.configure(text="✓ ✓\n✓")
             if self.pomodoros == 4:
                 self.pomodoro_done.configure(text="✓ ✓\n✓ ✓")
-            self.reps += 1
-        if self.pomodoro_interval_var.get() == 0:
-            if self.reps % 2 == 0:
-                self.top()
-                self.wk.configure(text_color="#AA5656")
-                self.br.configure(text_color="white")
-                self.start_count()
-                self.counter(1800)
-            elif self.reps % 2 != 0:
-                self.top()
-                if self.reps == 3:
-                    self.cache(1)
-                if self.reps % 3 == 0 and self.reps != 0:
-                    self.cache(1)
-                    self.counter(1200)
-                    self.wk.configure(text_color="white")
-                    self.br.configure(text_color="#AA5656")
-                    self.pomodoros += 1
-                else:
-                    self.counter(300)
-                    self.wk.configure(text_color="white")
-                    self.br.configure(text_color="#AA5656")
-                    self.pomodoros += 1
-
-            if self.pomodoros == 1:
-                self.pomodoro_done.configure(text="✓✓")
-            if self.pomodoros == 2:
-                self.pomodoro_done.configure(text="✓ ✓\n✓ ✓")
-            self.reps += 1
+        self.reps +=1
 
     def top(self):
         self.attributes('-topmost', 1)

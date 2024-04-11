@@ -73,7 +73,7 @@ class Pixela:
         print(self.quantity)
         if yesterday == "on":
             print('yesterday')
-            self.date_now = datetime.datetime.strftime(datetime.date.today().replace(day=datetime.datetime.today().day - 1), "%Y%m%d")
+            self.date_now = datetime.datetime.strftime(datetime.datetime.today() - datetime.timedelta(days=1), "%Y%m%d")
         if yesterday == "off":
             print("today")
             self.date_now = datetime.datetime.strftime(datetime.date.today(), "%Y%m%d")

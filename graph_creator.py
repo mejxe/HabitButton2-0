@@ -56,6 +56,7 @@ class GraphCreator():
         else:
             CTkMessagebox.CTkMessagebox(self.root, title="Error", icon="cancel", message="Username Too Short")
 
-
+if __name__ == "__main__":
+    graph = GraphCreator()
 
 

@@ -1,3 +1,4 @@
+from datetime import *
 import json
 
 from customtkinter import *
@@ -11,7 +12,23 @@ FONT = ("Work Sans", 15, "normal")
 graph_endpoints = {"study": "https://pixe.la/v1/users/mejxe/graphs/studygraph",
                    "math": "https://pixe.la/v1/users/mejxe/graphs/mathgraph",
                    "code": "https://pixe.la/v1/users/mejxe/graphs/codegraph"}
-
+# get the streaks with try/except as a safe measure
+with open("streaks.json","r") as file:
+    if not not file.read():
+        file.seek(0)
+        strks = json.load(file)
+        try:
+            STUDY_STREAK = strks["study"][datetime.strftime(date.today(), "%Y%m%d")]
+        except KeyError:
+            STUDY_STREAK = 0
+        try:
+            MATH_STREAK = strks["math"][datetime.strftime(date.today(), "%Y%m%d")]
+        except KeyError:
+            MATH_STREAK = 0
+        try:
+            CODE_STREAK = strks["code"][datetime.strftime(date.today(), "%Y%m%d")]
+        except KeyError:
+            CODE_STREAK = 0
 
 class Select:
     def __init__(self):
@@ -27,21 +44,29 @@ class Select:
 
         self.study = CTkButton(self.root, width=50, height=25, text="Study", font=FONT, bg_color=GRAY,
                                fg_color="#26842c", hover_color="dark green", corner_radius=10, state="disabled")
-        self.study.grid(column=1, row=1, padx=5, pady=5)
+        self.study.place(x=5, y=20)
+
+        self.study_streak = CTkLabel(self.root, text=f"🔥 {STUDY_STREAK}", font=(FONT), bg_color=GRAY)
+        self.study_streak.place(x=5, y=-10)
 
 
         self.code = CTkButton(self.root, width=50, height=25, text="Code", font=FONT, bg_color=GRAY,
                                fg_color="#3c007a",  hover_color = '#2A0944', corner_radius=10)
-        self.code.grid(column=2, row=1, padx=5, pady=5)
+        self.code.place(x=80, y=20)
+
+        self.code_streak = CTkLabel(self.root, text=f"🔥 {CODE_STREAK}", font=(FONT), bg_color=GRAY)
+        self.code_streak.place(x=80, y=-10)
 
 
         self.math = CTkButton(self.root, width=50, height=25, text="Math", font=FONT, bg_color=GRAY,
                                fg_color="#0055ab",  hover_color="dark blue", corner_radius=10)
-        self.math.grid(column=3, row=1, padx=5, pady=10)
+        self.math.place(x=150, y=20)
+        self.math_streak = CTkLabel(self.root, text=f"🔥 {MATH_STREAK}", font=(FONT), bg_color=GRAY)
+        self.math_streak.place(x=150, y=-10)
 
         self.auto = CTkButton(self.root, command=self.open_timer, width=20, height=20, text="Timer", font=FONT, bg_color=GRAY,
                                fg_color="#7D1935", hover_color="#480e1f", corner_radius=10)
-        self.auto.grid(column=2, row=2, columnspan=1)
+        self.auto.place(x=78, y=60)
 
         self.study.bind("<Button-1>", lambda *args: self.go_to('study'))
 
