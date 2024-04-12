@@ -16,17 +16,17 @@ graph_endpoints = {"study": "https://pixe.la/v1/users/mejxe/graphs/studygraph",
 with open("streaks.json","r") as file:
     if not not file.read():
         file.seek(0)
-        strks = json.load(file)
+        strks: dict = json.load(file)
         try:
-            STUDY_STREAK = strks["study"][datetime.strftime(date.today(), "%Y%m%d")]
+            STUDY_STREAK = strks["study"][list(strks["study"].keys())[0]]
         except KeyError:
             STUDY_STREAK = 0
         try:
-            MATH_STREAK = strks["math"][datetime.strftime(date.today(), "%Y%m%d")]
+            MATH_STREAK = strks["math"][list(strks["math"].keys())[0]]
         except KeyError:
             MATH_STREAK = 0
         try:
-            CODE_STREAK = strks["code"][datetime.strftime(date.today(), "%Y%m%d")]
+            CODE_STREAK = strks["code"][list(strks["code"].keys())[0]]
         except KeyError:
             CODE_STREAK = 0
 

@@ -45,61 +45,62 @@ with open("streaks.json","r") as st:
 #     print(streak)
 
 
-def get_pixels(endpoint:str, start_from: str = None) -> list:
+def get_pixels(endpoint:str, start_from: str = None) -> tuple:
+    streak_before = 0
     if start_from is not None:
-        json = {"from": start_from}
-        req = requests.get(endpoints[endpoint], headers=headers, json=json)
+        pars = {"from": start_from}
+        req = requests.get(endpoints[endpoint], headers=headers, params=pars)
+        streak_before = streaks[endpoint][start_from]
     else:
         req = requests.get(endpoints[endpoint], headers=headers)
-
-    return req.json()["pixels"]
-
-
-def cache_to_dir(type: str, streak_latest_day: str, streak_number: int):
-    streaks[type][streak_latest_day] = streak_number
+    print(req.text)
+    return req.json()["pixels"], streak_before
 
 
-def streak_counter(graph_pixels: list, graph_type:str) -> tuple:
+# def cache_to_dir(type: str, streak_latest_day: str, streak_number: int):
+#     streaks[type][streak_latest_day] = streak_number
+#     print(streaks)
+
+
+def streak_counter(graph_pixels: list, streak_before:int = 0) -> tuple:
     streak_going = True
     i: int = len(graph_pixels) - 1
-    streak_number: int = 1
+    streak_number: int = 1 + streak_before
+    if streak_before != 0:
+        streak_number -= 1
     streak_latest_day = graph_pixels[i]
     while streak_going and len(graph_pixels) != 0:
         day_new = datetime.strptime(graph_pixels[i], "%Y%m%d")
         day_bef = datetime.strptime(graph_pixels[i-1], "%Y%m%d")
-        # check if the day is in cache
-        day_strftime = datetime.strftime(day_new, "%Y%m%d")
-        if not do_not_check_cache:
-            if day_strftime in streaks[graph_type]:
-                streak_number += streaks[graph_type][day_strftime] - 1
-                streak_going = False
         if day_new - day_bef == timedelta(days=1):
             graph_pixels.pop()
             streak_number += 1
             i -= 1
-            print(day_new)
+            # print(day_new)
         else:
             streak_going = False
-            cache_to_dir(graph_type,streak_latest_day, streak_number)
+            # cache_to_dir(graph_type,streak_latest_day, streak_number)
     return streak_latest_day, streak_number
 # just enter the graph name
 def calculate(endpoint):
     yesterday = [datetime.strftime(datetime.today()-timedelta(days=1) , "%Y%m%d")]
     try:
-        pixels = get_pixels(endpoint,streaks[endpoint][yesterday])
+        pixels, streak_before = get_pixels(endpoint, list(streaks[endpoint].keys())[0])
     except KeyError:
         pixels = get_pixels(endpoint)
-    streak_day, streak_number = streak_counter(pixels,endpoint)
-    return streak_day, streak_number
+        streak_before = 0
+    streak_day, streak_number = streak_counter(pixels, streak_before)
+    return streak_number, streak_day
 def daily_run():
-    global streaks
     code_streak, code_day = calculate("code")
     math_streak, math_day = calculate("math")
     study_streak, study_day = calculate("study")
     streaks = {"study":{study_day:study_streak}, "code":{code_day:code_streak},"math":{math_day:math_streak}}
 
-with open("streaks.json","w") as f:
-    json.dump(streaks,f, indent=4)
+
+    with open("streaks.json","w") as f:
+        json.dump(streaks,f, indent=4)
 
 
-
+if __name__ == "__main__":
+    get_pixels("study",list(streaks["study"].keys())[0])
