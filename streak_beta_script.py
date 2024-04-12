@@ -13,13 +13,17 @@ endpoints = {"study": "https://pixe.la/v1/users/mejxe/graphs/studygraph/pixels",
 
 # get the streaks from the cache file
 do_not_check_cache = False
-with open("streaks.json","r") as st:
-    if not not st.read():
-        st.seek(0)
-        streaks = json.load(st)
-    else:
-        do_not_check_cache = True
-        streaks = {"study":{},"code":{},"math":{}}
+try:
+    with open("streaks.json","r") as st:
+        if not not st.read():
+            st.seek(0)
+            streaks = json.load(st)
+        else:
+            do_not_check_cache = True
+            streaks = {"study":{},"code":{},"math":{}}
+except FileNotFoundError:
+    do_not_check_cache = True
+    streaks = {"study": {}, "code": {}, "math": {}}
 
 # for i, j in enumerate(req.json()["pixels"]):
 #     year = j[0:4]
