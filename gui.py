@@ -1,4 +1,3 @@
-import time
 
 from customtkinter import *
 from api_comms import Pixela
@@ -13,17 +12,18 @@ class Gui(CTkToplevel):
         self.geometry("250x450+960+540")
         self.resizable(False,False)
         if pixela.graph_endpoint == "https://pixe.la/v1/users/mejxe/graphs/studygraph":
-            self.title(pixela.graph_title[1])
             self.colors = ['#effaef','#c2edc5','#96e09b','#70d577','#44c94d',
                            '#31aa39','#26842c','#1b5e1f','#103813','#103813']
         elif pixela.graph_endpoint == "https://pixe.la/v1/users/mejxe/graphs/mathgraph":
-            self.title(pixela.graph_title[2])
             self.colors = ['#daecfe','#a9d3ff','#78bbff','#47a2ff','#168aff',
                            '#006ad5','#0055ab','#003c7a','#002449','#000c18']
-        else:
-            self.title(pixela.graph_title[0])
+        elif pixela.graph_name == "code":
             self.colors = ['#f4eaff','#d8b1fe','#bf80ff','#a247ff','#860eff',
                            "#6d00dc",'#5500ab','#3c007a','#240049','#080010']
+        else:
+            self.colors = ["#ffd5d5","#ffa6a6","#ff8f8f","#ff6060","#ff2b2b",
+                           "#ff1313","#fd0000","#ee0000","#ff0000","#b30000"]
+        self.title(f"{pixela.graph_name} graph".title())
         self.pixela = pixela
         self.quantity = quantity
         if self.quantity >= 19:
@@ -38,9 +38,9 @@ class Gui(CTkToplevel):
         self.clear_button = CTkButton(self, height=100, width=100, text="X",hover_color="#950101",corner_radius=30, bg_color=GRAY, fg_color="#7D1935", text_color="black", font=FONT, command=self.reset)
         self.clear_button.grid(column=0, row=2, pady=15, padx=20)
 
-        self.yesterday_var = StringVar(value="off")
+        self.yesterday_var = BooleanVar(value=False)
         self.yesterday_switch = CTkSwitch(self, height=20, width=20, text="Yesterday.", font=("Work Sans", 14, "normal"),
-                                          bg_color=GRAY, fg_color="gray",button_color="white", onvalue="on", offvalue='off', border_color="gray",hover=False, progress_color=GRAY, variable=self.yesterday_var)
+                                          bg_color=GRAY, fg_color="gray",button_color="white", onvalue=True, offvalue=False, border_color="gray",hover=False, progress_color=GRAY, variable=self.yesterday_var)
         self.yesterday_switch.grid(column=0, row=0, pady=15)
 
         if self.quantity >= 9:
@@ -61,7 +61,7 @@ class Gui(CTkToplevel):
         self.mainloop()
 
     def color_change(self):
-        self.quantity = self.pixela.quantity_up()
+        self.quantity = self.pixela.increment()
         if self.quantity >= 9:
             self.button.configure(fg_color=self.colors[-1],
                                   text=f"{self.quantity} Hours.", text_color="white")
@@ -71,7 +71,7 @@ class Gui(CTkToplevel):
 
     def reset(self):
         self.quantity = 0
-        self.pixela.json_clear()
+        self.pixela.clear_pixel()
         self.button.configure(fg_color=self.colors[int(self.quantity)],
                               text=f"{self.quantity} Hours.", text_color="black")
 
@@ -83,7 +83,7 @@ class Gui(CTkToplevel):
 
     def on_close(self):
         self.withdraw()
-        self.pixela.create_pixel(self.yesterday_var.get())
+        self.pixela.update_pixel(self.yesterday_var.get())
         self.pixela.clear_timer()
         self.quit()
         self.destroy()

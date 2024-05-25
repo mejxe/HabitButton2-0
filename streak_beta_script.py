@@ -49,7 +49,7 @@ except FileNotFoundError:
 #     print(streak)
 
 
-def get_pixels(endpoint:str, start_from: str = None) -> tuple:
+def get_pixels(endpoint:str, start_from: str or bool) -> tuple:
     streak_before = 0
     if start_from is not None:
         pars = {"from": start_from}
@@ -57,7 +57,7 @@ def get_pixels(endpoint:str, start_from: str = None) -> tuple:
         streak_before = streaks[endpoint][start_from]
     else:
         req = requests.get(endpoints[endpoint], headers=headers)
-    print(req.text)
+    print(req.text, req.url)
     return req.json()["pixels"], streak_before
 
 
@@ -67,6 +67,8 @@ def get_pixels(endpoint:str, start_from: str = None) -> tuple:
 
 
 def streak_counter(graph_pixels: list, streak_before:int = 0) -> tuple:
+    if datetime.strftime(datetime.today()- timedelta(days=1), "%Y%m%d") not in graph_pixels:
+        return datetime.strftime(datetime.today() - timedelta(days=1), "%Y%m%d"), 0
     streak_going = True
     i: int = len(graph_pixels) - 1
     streak_number: int = 1 + streak_before
@@ -87,12 +89,11 @@ def streak_counter(graph_pixels: list, streak_before:int = 0) -> tuple:
     return streak_latest_day, streak_number
 # just enter the graph name
 def calculate(endpoint):
-    yesterday = [datetime.strftime(datetime.today()-timedelta(days=1) , "%Y%m%d")]
+    yesterday = datetime.strftime(datetime.today()-timedelta(days=1) , "%Y%m%d")
     try:
         pixels, streak_before = get_pixels(endpoint, list(streaks[endpoint].keys())[0])
     except KeyError:
-        pixels = get_pixels(endpoint)
-        streak_before = 0
+        pixels, streak_before = get_pixels(endpoint, None)
     streak_day, streak_number = streak_counter(pixels, streak_before)
     return streak_number, streak_day
 def daily_run():
@@ -107,4 +108,4 @@ def daily_run():
 
 
 if __name__ == "__main__":
-    get_pixels("study",list(streaks["study"].keys())[0])
+    daily_run()

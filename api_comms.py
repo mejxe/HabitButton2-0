@@ -7,15 +7,7 @@ class Pixela:
     def __init__(self,graph_endpoint, graph_name, auto_commits=0):
         self.username = "mejxe"
         self.token = os.environ.get("token")
-        self.graph_data = {
-            "id": "studygraph",
-            "name": "Study Tracker",
-            "unit": "hours",
-            "type": "int",
-            "color": "shibafu"
-        }
         self.graph_endpoint = graph_endpoint
-        self.graph_title = ["Code Tracker","Study Tracker", "Math Tracker"]
         self.graph_name = graph_name
         self.headers = {
             "X-USER-TOKEN": self.token
@@ -29,162 +21,94 @@ class Pixela:
         req = requests.get(f"{self.graph_endpoint}/{self.date_now}",
                            headers=self.headers)
         response = req.json()
-        print(response)
         try:
-            self.quantity = response["quantity"]
+            self.quantity = (int(response["quantity"]) + self.auto_commits)
         except KeyError:
-            if response["message"] == "Specified pixel not found.":
-                self.quantity = "0"
-            elif response["isRejected"]:
-                while True:
-                            s = requests.get(f"{self.graph_endpoint}/{self.date_now}", headers=self.headers)
-                            if "message" in s.json():
-                                if s.json()["message"] == "Specified pixel not found.":
-                                    self.quantity = 0
-                                    print('not found')
-                                    break
-                            if 'isRejected' in s.json():
-                                print('rejected')
-                                pass
-                            else:
-                                if "quantity" in s.json():
-                                    self.quantity = s.json()["quantity"]
-                                    print("success")
-                                    break
-                                else: raise Exception(TimeoutError)
-
-        if self.auto_commits != 0:
-            self.quantity = int(self.quantity)+self.auto_commits
-        with open('commits.json', "r") as data_file:
-            data = json.load(data_file)
-            data_to_update = {self.graph_name: int(self.quantity)}
-            data.update(data_to_update)
-        with open('commits.json', "w") as data_file:
-            json.dump(data, data_file, indent=2)
+            self.quantity = 0
+            self.create_pixel()
+        print(response)
         return self.quantity
 
+    def create_pixel(self):
+        # print(self.quantity)
+        # if yesterday == "on":
+        #     print('yesterday')
+        #     self.date_now = datetime.datetime.strftime(datetime.datetime.today() - datetime.timedelta(days=1), "%Y%m%d")
+        # if yesterday == "off":
+        #     print("today")
+        #     self.date_now = datetime.datetime.strftime(datetime.date.today(), "%Y%m%d")
+        # data = {
+        #     "date": self.date_now,
+        #     "quantity": str(self.quantity)
+        #     }
+        # req = requests.post(f"{self.graph_endpoint}", json=data, headers=self.headers)
 
-    def graph_create(self):
-        graph = requests.post(f'https://pixe.la/v1/users/{self.username}/graphs', headers=self.headers, json=self.graph_data)
-        print(graph.text)
-
-
-    def create_pixel(self, yesterday:str):
-        print(self.quantity)
-        if yesterday == "on":
-            print('yesterday')
-            self.date_now = datetime.datetime.strftime(datetime.datetime.today() - datetime.timedelta(days=1), "%Y%m%d")
-        if yesterday == "off":
-            print("today")
-            self.date_now = datetime.datetime.strftime(datetime.date.today(), "%Y%m%d")
         data = {
-            "date": self.date_now,
+            "date":self.date_now,
+            "quantity": "0"
+        }
+        req = requests.post(f"{self.graph_endpoint}", json=data, headers=self.headers)
+
+
+    def update_pixel(self, yesterday:bool=False):
+        if yesterday:
+            self.date_now = datetime.datetime.strftime(datetime.datetime.today() - datetime.timedelta(days=1), "%Y%m%d")
+        data = {
             "quantity": str(self.quantity)
-            }
-        while True:
-                req = requests.post(f"{self.graph_endpoint}", json=data, headers=self.headers)
-                response = req.json()
-                print(response)
-                if "isRejected" in response:
-                    print(response)
-                else:
-                    break
-
-        self.calculate_study()
-
+        }
+        req = requests.put(f"{self.graph_endpoint}/{self.date_now}", json=data, headers=self.headers)
+        if not yesterday:
+            with open("commits.json", "r") as data_file:
+                local = json.load(data_file)
+                local_update = {self.graph_name: int(self.quantity)}
+                local.update(local_update)
+            with open("commits.json","w") as data_file:
+                json.dump(local,data_file,indent=2)
+            self.calculate_study()
+        print(req.json())
 
     def calculate_study(self):
         with open("commits.json", "r") as data_file:
             data = json.load(data_file)
-            self.study_time = {"study": (int(data['math']) + int(data['code']))}
-            data.update(self.study_time)
-        with open('commits.json', "w") as data_file:
-            json.dump(data, data_file, indent=2)
-        self.upload_study()
+            study_time = 0
+            for time in data.values():
+                study_time += int(time)
+        self.upload_study(study_time)
 
 
-    def upload_study(self):
+    def upload_study(self, study_time):
         data = {
             "date": self.date_now,
-            "quantity": str(self.study_time["study"])
+            "quantity": str(study_time)
         }
-        while True:
-            req = requests.post("https://pixe.la/v1/users/mejxe/graphs/studygraph", json=data, headers=self.headers)
-            response = req.json()
-            print(response)
-            if "isRejected" in response:
-                print(response)
-            else:
-                break
-
-    def update_pixel(self):
-        print(self.quantity)
-        data = {
-            "quantity":str(self.quantity)
-        }
-        while True:
-            try:
-                req = requests.put(f"{self.graph_endpoint}/{self.date_now}", json=data, headers=self.headers)
-                response = req.json()
-                print(response)
-                if response["isRejected"]:
-                    print(response)
-                else:
-                    break
-            except KeyError:
-                break
-
+        req = requests.post("https://pixe.la/v1/users/mejxe/graphs/studygraph", json=data, headers=self.headers)
 
 
 # DELETE
     def clear_pixel(self):
-        data = {
-            "date": self.date_now,
-        }
-        req = requests.delete(f"{self.graph_endpoint}/{self.date_now}", headers=self.headers)
-        while not req.json()["isSuccess"]:
-            try:
-                p = requests.delete(f"{self.graph_endpoint}/{self.date_now}",
-                                    headers=self.headers)
-                _ = p.json()["isRejected"]
-            except KeyError:
-                print("Success")
-                break
         self.quantity = 0
 
 # CLEAR TIMER COMMITS DATA
     def clear_timer(self):
-        with open("timer_commits.json", "r") as dataload:
-            data = json.load(dataload)
-            clear_commits = {
-                self.graph_name: 0,
-                           }
-            data.update(clear_commits)
-        # update data
-        with open("timer_commits.json", "w") as loaddata:
-            json.dump(data, loaddata, indent=4)
+        try:
+            with open("timer_commits.json", "r") as dataload:
+                data = json.load(dataload)
+
+                clear_commits = {
+                    self.graph_name: float(data[self.graph_name]%1),
+                               }
+                data.update(clear_commits)
+            # update data
+            with open("timer_commits.json", "w") as loaddata:
+                json.dump(data, loaddata, indent=4)
+        except KeyError:
+            pass
 
 
-    def quantity_up(self):
-        with open("commits.json", "r") as data_file:
-            data = json.load(data_file)
-            quantity = int(data[self.graph_name])
-            quantity += 1
-            self.quantity = quantity
-            data_to_update = {self.graph_name: quantity}
-            data.update(data_to_update)
+    def increment(self):
+        self.quantity = int(self.quantity) + 1
+        return self.quantity
 
-        with open('commits.json', "w") as data_file:
-            json.dump(data, data_file, indent=2)
-        return quantity
 
-    def json_clear(self):
-        with open('commits.json', 'r') as data_file:
-            data = json.load(data_file)
-            data_to_update = {self.graph_name: 0}
-            data.update(data_to_update)
-        with open('commits.json', 'w') as data_file:
-            json.dump(data, data_file, indent=2)
-        self.quantity = 0
 
 
