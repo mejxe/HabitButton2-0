@@ -19,7 +19,14 @@ headers = {"X-USER-TOKEN": os.environ.get("token")}
 streak_beta_script.daily_run()
 for name,endpoint in graph_endpoints.items():
     pix = api_comms.Pixela(endpoint,name)
-    pix.get_pixel_attributes()
+    commits = pix.get_pixel_attributes()
+    if name != "study":
+        with open("commits.json") as f:
+            temp = json.load(f)
+            _ = {name: commits}
+            temp.update(_)
+        with open("commits.json", "w") as g:
+            json.dump(temp, g, indent=3)
 
 
 

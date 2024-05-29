@@ -19,17 +19,21 @@ with open("streaks.json","r") as file:
         file.seek(0)
         strks: dict = json.load(file)
         try:
-            STUDY_STREAK = strks["study"][list(strks["study"].keys())[0]]
+            STUDY_STREAK = strks["study"][1]
         except KeyError:
             STUDY_STREAK = 0
         try:
-            MATH_STREAK = strks["math"][list(strks["math"].keys())[0]]
+            MATH_STREAK = strks["math"][1]
         except KeyError:
             MATH_STREAK = 0
         try:
-            CODE_STREAK = strks["code"][list(strks["code"].keys())[0]]
+            CODE_STREAK = strks["code"][1]
         except KeyError:
             CODE_STREAK = 0
+        try:
+            JAP_STREAK = strks["japan"][1]
+        except KeyError:
+            JAP_STREAK = 0
 
 class Select:
     def __init__(self):
@@ -50,6 +54,8 @@ class Select:
         self.study_streak = CTkLabel(self.root, text=f"🔥 {STUDY_STREAK}", font=(FONT), bg_color=GRAY)
         self.study_streak.place(x=5, y=-10)
 
+        self.jap_streak = CTkLabel(self.root, text=f"🔥 {JAP_STREAK}", font=(FONT), bg_color=GRAY)
+        self.jap_streak.place(x=35, y=85)
         self.japanese = CTkButton(self.root, width=50, height=25, text="Japanese", font=FONT, bg_color=GRAY,
                                fg_color="#FFD1E3",  hover_color = '#ffaccc', corner_radius=10, text_color="black")
         self.japanese.place(x=5, y=60)
@@ -90,7 +96,7 @@ class Select:
         if endpoint != "japan":
             with open("timer_commits.json", "r") as loaddata:
                 data = json.load(loaddata)
-            pixela = Pixela(graph_endpoints[endpoint], graph_name=endpoint, auto_commits=data[endpoint])
+            pixela = Pixela(graph_endpoints[endpoint], graph_name=endpoint, auto_commits=int(data[endpoint]))
         else:
             pixela = Pixela(graph_endpoints[endpoint], graph_name=endpoint)
         quantity = pixela.get_pixel_attributes()
