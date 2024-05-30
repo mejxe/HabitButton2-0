@@ -2,15 +2,9 @@
 from selection import Select
 from graph_creator import GraphCreator
 
-try:
-    f = open("user_data.json", "r")
-except FileNotFoundError:
-    graph = GraphCreator()
-    exit()
 
-if f.read() == "":
-    graph = GraphCreator()
-    exit()
+
+
 graph_endpoints = {"study": "https://pixe.la/v1/users/mejxe/graphs/studygraph",
                    "math": "https://pixe.la/v1/users/mejxe/graphs/mathgraph",
                    "code": "https://pixe.la/v1/users/mejxe/graphs/codegraph"}
