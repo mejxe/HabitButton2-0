@@ -1,1 +1,1 @@
-pixela gui integration with a simple button
+One of my first projects, built it around half a year ago and used it since. Using pixela api with a cool gui. Sadly many things are hardcoded so its not really usable for others, you can use it as a blueprint and create your own tho, thanks for cheking in.
