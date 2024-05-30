@@ -8,11 +8,11 @@ run only if you want to make, update or delete an endpoint
 
 
 graph_data = {
-            "id": "codegraph",
-            "name": "Coding Tracker",
+            "id": "japgrah",
+            "name": "Japanese",
             "unit": "hours",
             "type": "int",
-            "color": "ajisai"
+            "color": "momiji"
 }
 token = os.environ.get("token")
 headers = {
@@ -36,4 +36,4 @@ def update(graph_endpoint):
 def update_user(user):
     print(requests.put(f"https://pixe.la/v1/users/{user}", headers=headers, json={"thanksCode":"22c5698062c595820b6b815ae2cd76b83da9eda658402bce3bc0a066c0ddb250"}).text)
 
-update_user("mejxe")
+create()

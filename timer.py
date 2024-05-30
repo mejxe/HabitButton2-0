@@ -29,10 +29,10 @@ FONT = ("Work Sans Light", 70, "normal")
 BFONT = ("Work Sans", 15, "normal")
 CFONT = ("Work Sans", 17, "normal")
 GRAY = "#303030"
-with open("time.txt", "r+") as f:
-    TIME_NOT_FINISHED = f.read()
-    if TIME_NOT_FINISHED == "":
-        TIME_NOT_FINISHED = 0
+# with open("time.txt", "r+") as f:
+#     TIME_NOT_FINISHED = f.read()
+#     if TIME_NOT_FINISHED == "":
+#         TIME_NOT_FINISHED = 0
 class Timer(CTkToplevel):
     def __init__(self, graphs, root):
         super().__init__()
@@ -61,13 +61,12 @@ class Timer(CTkToplevel):
         self.br = CTkLabel(self.frame,text="break.", font=("Work Sans", 13, "normal"))
         self.wk = CTkLabel(self.frame,text="work.", font=("Work Sans", 13, "normal"))
         # TODO: Slider to change timer hours
-        if int(TIME_NOT_FINISHED) != 0:
-            self.clock.configure(text=f"{math.floor(int(TIME_NOT_FINISHED)/3600):02}:{int((int(TIME_NOT_FINISHED)/60)%60):02}:{int(TIME_NOT_FINISHED)%60:02}")
-            self.slider_var = IntVar()
-        else:
-            self.slider_var = IntVar(value=1)
-            self.set_time()
-        self.hour_slider = CTkSlider(self.frame, orientation="vertical", from_=1, to=10, number_of_steps=9, command=self.set_time, height=100, button_color="#A619D5", button_hover_color="#e2c8ff", variable=self.slider_var)
+        # if float(TIME_NOT_FINISHED) != 0:
+        #     self.clock.configure(text=f"{math.floor(float(TIME_NOT_FINISHED)/3600):02}:{float((float(TIME_NOT_FINISHED)/60)%60):02}:{float(TIME_NOT_FINISHED)%60:02}")
+        #     self.slider_var = IntVar()
+        self.slider_var = IntVar(value=1)
+        self.set_time()
+        self.hour_slider = CTkSlider(self.frame, orientation="vertical", from_=1, to=10, number_of_steps=18, command=self.set_time, height=100, button_color="#A619D5", button_hover_color="#e2c8ff", variable=self.slider_var)
         self.hour_slider.place(x=360, y=30)
         # TODO 2: progress bar for coolness
         self.progress = CTkProgressBar(self.frame, determinate_speed=.83, progress_color="gray")
@@ -116,35 +115,36 @@ class Timer(CTkToplevel):
         self.pomodoro_switch.configure(state="disabled")
 
     def deafult(self):
-        global TIME_NOT_FINISHED
+        # global TIME_NOT_FINISHED
         self.start_count()
-        if int(TIME_NOT_FINISHED) != 0:
-            self.counter(int(TIME_NOT_FINISHED))
-            TIME_NOT_FINISHED = 0
-            with open("time.txt", "w") as f:
-                f.write(str(TIME_NOT_FINISHED))
-        else:
-            self.counter(self.deafult_time)
+        # if (TIME_NOT_FINISHED) != 0:
+        #     self.counter((TIME_NOT_FINISHED))
+        #     TIME_NOT_FINISHED = 0
+        #     with open("time.txt", "w") as f:
+        #         f.write(str(TIME_NOT_FINISHED))
+        # else:
+        self.counter(self.deafult_time)
 
     def clear_time(self):
-        global TIME_NOT_FINISHED
-        TIME_NOT_FINISHED = 0
+        # global TIME_NOT_FINISHED
+        # TIME_NOT_FINISHED = 0
         if self.var.get() == 0:
-            self.clock.configure(text="00:00:00")
+            self.clock.configure(text="01:00:00")
 
 
     def set_time(self, slider_time=1):
-        self.deafult_time = int(slider_time) * 3600
+        self.deafult_time = (slider_time) * 3600
         print(slider_time)
-        self.clock.configure(text=f"{int(slider_time):02}:00:00")
+        print(self.deafult_time)
+        self.clock.configure(text=f"{int(slider_time):02}:{int((slider_time*60)%60):02}:00")
 
     def counter(self, time):
         # time assessment
-        self.strftime = time
+        self.strftime = float(time)
         self.progress.step()
         hours = math.floor(self.strftime/3600)
         minutes = int(self.strftime/60) % 60
-        seconds = self.strftime % 60
+        seconds = int(self.strftime % 60)
         minutes_not_formatted = minutes
         seconds_not_formatted = seconds
         if self.var.get() == 0:
@@ -180,8 +180,8 @@ class Timer(CTkToplevel):
                 self.over()
                 self.popup()
 
-            if self.strftime % 3600 == 0 and self.strftime != self.deafult_time:
-                self.cache(1)
+            if self.strftime % 1800 == 0 and self.strftime != self.deafult_time:
+                self.cache(0.5)
 
     # enable/disable start button
     def enable(self):
@@ -270,7 +270,7 @@ class Timer(CTkToplevel):
             #load data
             with open("timer_commits.json", "r") as dataload:
                 data = json.load(dataload)
-                new_commits = {"math": int(data["math"])+int(commits)}
+                new_commits = {"math": float(data["math"])+float(commits)}
                 data.update(new_commits)
             #update data
             with open("timer_commits.json", "w") as loaddata:
@@ -281,7 +281,7 @@ class Timer(CTkToplevel):
             # load data
             with open("timer_commits.json", "r") as dataload:
                 data = json.load(dataload)
-                new_commits = {"code": int(data["code"]) + int(commits)}
+                new_commits = {"code": float(data["code"]) + float(commits)}
                 data.update(new_commits)
             # update data
             with open("timer_commits.json", "w") as loaddata:
@@ -409,7 +409,7 @@ class Timer(CTkToplevel):
                 self.wk.configure(text_color="#AA5656")
                 self.br.configure(text_color="white")
                 self.start_count()
-                self.counter(2)
+                self.counter(1800)
             elif self.reps % 2 != 0:
                 self.top()
                 if self.reps == 3:
@@ -421,7 +421,7 @@ class Timer(CTkToplevel):
                     self.br.configure(text_color="#AA5656")
                     self.pomodoros += 1
                 else:
-                    self.counter(3)
+                    self.counter(300)
                     self.wk.configure(text_color="white")
                     self.br.configure(text_color="#AA5656")
                     self.pomodoros += 1
