@@ -3,4 +3,4 @@ One of my first projects, built it around half a year ago and used it since. Usi
 GUI
 ![Selection](pics/selection.png)
 ![Button](pics/button.png)
-![Timer](pics/timer.png)
+![Timer](pics/timer2.png)
