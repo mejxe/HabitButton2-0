@@ -48,11 +48,14 @@ class Pixela:
             "quantity": "0"
         }
         req = requests.post(f"{self.graph_endpoint}", json=data, headers=self.headers)
+        print(req.json())
 
 
     def update_pixel(self, yesterday:bool=False):
         if yesterday:
             self.date_now = datetime.datetime.strftime(datetime.datetime.today() - datetime.timedelta(days=1), "%Y%m%d")
+            study_time = requests.get(f"https://pixe.la/v1/users/mejxe/graphs/studygraph/{self.date_now}", headers=self.headers).json()["quantity"]
+            self.upload_study(str(int(study_time) + self.quantity))
         data = {
             "quantity": str(self.quantity)
         }
