@@ -2,6 +2,7 @@ import os
 import requests
 from datetime import datetime, timedelta
 import json
+from api_comms import Pixela
 token = os.environ.get("token")
 headers = {
             "X-USER-TOKEN": token
@@ -102,6 +103,9 @@ def calculate(endpoint):
     return streak, datetime.strftime(datetime.today().date(),"%Y%m%d")
 
 def daily_run():
+    # for i in endpoints:
+    #     ns = Pixela(graph_endpoint=endpoints[i], graph_name=i)
+    #     ns.create_pixel()
     code_streak, code_day = calculate("code")
     math_streak, math_day = calculate("math")
     study_streak, study_day = calculate("study")
