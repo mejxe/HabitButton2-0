@@ -3,7 +3,6 @@ import json
 from customtkinter import *
 import math
 from CTkMessagebox import  CTkMessagebox
-import winsound
 
 colors_code = ['#f4eaff','#d8b1fe','#bf80ff','#a247ff','#860eff',
                            "#6d00dc",'#5500ab','#3c007a','#240049','#080010']
@@ -306,7 +305,6 @@ class Timer(CTkToplevel):
         self.focus_force()
         self.lift()
         self.deiconify()
-        winsound.MessageBeep()
         color = "blue"
         hover_color= "gray"
         if self.r.get() == 1:
@@ -441,4 +439,3 @@ class Timer(CTkToplevel):
         self.focus_force()
         self.lift()
         self.deiconify()
-        winsound.MessageBeep()

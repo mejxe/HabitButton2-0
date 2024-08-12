@@ -15,7 +15,7 @@ graph_endpoints = {"study": "https://pixe.la/v1/users/mejxe/graphs/studygraph",
                    "japan":"https://pixe.la/v1/users/mejxe/graphs/japgrah"}
 # get the streaks with try/except as a safe measure
 with open("streaks.json","r") as file:
-    if not not file.read():
+    if file.read():
         file.seek(0)
         strks: dict = json.load(file)
         try:
@@ -34,7 +34,11 @@ with open("streaks.json","r") as file:
             JAP_STREAK = strks["japan"][1]
         except KeyError:
             JAP_STREAK = 0
-
+    else: 
+        STUDY_STREAK = 0
+        MATH_STREAK = 0
+        CODE_STREAK = 0
+        JAP_STREAK = 0
 class Select:
     def __init__(self):
         self.root = CTk()

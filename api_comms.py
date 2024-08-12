@@ -12,7 +12,7 @@ class Pixela:
         self.headers = {
             "X-USER-TOKEN": self.token
         }
-        self.date_now = datetime.datetime.strftime(datetime.date.today(), "%Y%m%d")
+        self.date_now = (datetime.date.today().strftime( "%Y%m%d"))
         self.auto_commits = auto_commits
         # PIXEL ATTRIBUTES
 
@@ -51,24 +51,41 @@ class Pixela:
         print(req.json())
 
 
-    def update_pixel(self, yesterday:bool=False):
+    def update_pixel(self, yesterday:bool=False, manual_date=None):
         data = {
             "quantity": str(self.quantity)
         }
+
+        if yesterday and manual_date:
+            print("Not possible")
+            return
+
         if yesterday:
             self.date_now = datetime.datetime.strftime(datetime.datetime.today() - datetime.timedelta(days=1), "%Y%m%d")
-            study_time = requests.get(f"https://pixe.la/v1/users/mejxe/graphs/studygraph/{self.date_now}", headers=self.headers).json()["quantity"]
+
+            try:
+                study_time = requests.get(f"https://pixe.la/v1/users/mejxe/graphs/studygraph/{self.date_now}", headers=self.headers).json()["quantity"]
+            except KeyError:
+                study_time = "0"
+
             self.upload_study(str(int(study_time) + self.quantity))
-        req = requests.put(f"{self.graph_endpoint}/{self.date_now}", json=data, headers=self.headers)
+
+        if manual_date is None:
+            manual_date = self.date_now
+
+        req = requests.put(f"{self.graph_endpoint}/{manual_date}", json=data, headers=self.headers)
+
         if not yesterday:
             with open("commits.json", "r") as data_file:
                 local = json.load(data_file)
                 local_update = {self.graph_name: int(self.quantity)}
                 local.update(local_update)
+
             with open("commits.json","w") as data_file:
                 json.dump(local,data_file,indent=2)
             self.calculate_study()
-        print(req.json())
+
+        return req.json()
 
     def calculate_study(self):
         with open("commits.json", "r") as data_file:
@@ -79,13 +96,15 @@ class Pixela:
         self.upload_study(study_time)
 
 
-    def upload_study(self, study_time):
+    def upload_study(self, study_time, dateOfCommit=None):
+        if dateOfCommit == None:
+            dateOfCommit=self.date_now
         data = {
-            "date": self.date_now,
+            "date": str(dateOfCommit),
             "quantity": str(study_time)
         }
         req = requests.post("https://pixe.la/v1/users/mejxe/graphs/studygraph", json=data, headers=self.headers)
-
+        print(req.json())
 
 # DELETE
     def clear_pixel(self):
@@ -114,4 +133,7 @@ class Pixela:
 
 
 
-
+if __name__ == "__main__":
+    api = Pixela("https://pixe.la/v1/users/mejxe/graphs/japgrah", "japan")
+    api.quantity = 1
+    print(api.update_pixel(manual_date="20240810"))
